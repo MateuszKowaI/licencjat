@@ -1,0 +1,25 @@
+from dronekit import connect, VehicleMode, LocationGlobalRelative
+import time
+
+# ustanowienie połączenia z Pixhawk
+vehicle = connect('/dev/ttyAMA0', wait_ready=True)
+
+# podróż do punktu
+def send_to_waypoint(lat, lon, alt):
+    waypoint = LocationGlobalRelative(lat, lon, alt)
+    print(f"Going to waypoint: Lat={lat}, Lon={lon}, Alt={alt}")
+    vehicle.simple_goto(waypoint)
+
+# punkty (szerokość geo, długość geo, wysokość)
+waypoints = [
+    (51.245527, 22.541638, 20),  # latanie nad Marią
+    (51.049805, 22.444916, 30),  # latanie przy takim jednym młynie w Strzyżewicach
+]
+
+# pętla po punktach
+for wp in waypoints:
+    send_to_waypoint(wp[0], wp[1], wp[2])
+    time.sleep(10)  
+
+# zamknięcie połączenia
+vehicle.close()
