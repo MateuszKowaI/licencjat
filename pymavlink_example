@@ -1,0 +1,32 @@
+from pymavlink import mavutil
+import time
+
+#  ustanowienie połączenia z Pixhawk
+master = mavutil.mavlink_connection('/dev/ttyAMA0', baud=57600)
+
+# wysłanie komendy MAVLink do podążania do punktu
+def goto_waypoint(lat, lon, alt):
+    # komenda MAVLink do zmiany położenia drona
+    master.mav.mission_item_send(
+        master.target_system, master.target_component,
+        0,
+        mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+        mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+        2,
+        0,
+        0, 0, 0, 0, 0,
+        lat, lon, alt
+    )
+    print(f"Sent to waypoint: Lat={lat}, Lon={lon}, Alt={alt}")
+
+# punkty
+waypoints = [
+   (51.245527, 22.541638, 20),  # latanie nad Marią
+    (51.049805, 22.444916, 30),  # latanie przy takim jednym młynie w Strzyżewicach
+]
+
+# pętla po punktach
+for wp in waypoints:
+    goto_waypoint(wp[0], wp[1], wp[2])
+    time.sleep(10)
+
