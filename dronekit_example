@@ -18,7 +18,7 @@ waypoints = [
 
 # pętla po punktach
 for wp in waypoints:
-    send_to_waypoint(wp[0], wp[1], wp[2])
+    send_to_waypoint(wp[0], wp[1])
     time.sleep(10)  
 
 # zamknięcie połączenia
