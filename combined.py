@@ -22,13 +22,10 @@ def main():
         # Connect to drone
         vehicle = connect(DRONE_PORT, wait_ready=True)
         print("Connected to drone")
-	
-	vehicle.message_factory.statustext_send(
-		mavutil.mavlink.MAV_SEVERITY_ALERT,
-		b"companion computer connected"
-		)
-	vehicle.flush()
 
+	vehicle.message_factory.statustext_send(mavutil.mavlink.MAV_SEVERITY_ALERT,b"Companion computer connected")
+	vehicle.flush()
+	
         while True:
             line = ser.readline().decode('utf-8').strip()
 
