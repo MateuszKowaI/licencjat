@@ -3,10 +3,9 @@ import time
 from dronekit import connect
 from pymavlink import mavutil
 
-
-ARDUINO_PORT = '/dev/ttyUSB0'
+ARDUINO_PORT = "/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0"
 ARDUINO_BAUD = 9600
-DRONE_PORT = '/dev/ttyACM0'
+DRONE_PORT = "/dev/serial/by-id/usb-Holybro_Pixhawk6C_450046001751333337363133-if00"
 THRESHOLD = 30
 
 
@@ -23,6 +22,12 @@ def main():
         # Connect to drone
         vehicle = connect(DRONE_PORT, wait_ready=True)
         print("Connected to drone")
+	
+	vehicle.message_factory.statustext_send(
+		mavutil.mavlink.MAV_SEVERITY_ALERT,
+		b"companion computer connected"
+		)
+	vehicle.flush()
 
         while True:
             line = ser.readline().decode('utf-8').strip()
