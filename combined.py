@@ -9,6 +9,33 @@ DRONE_PORT = "/dev/serial/by-id/usb-Holybro_Pixhawk6C_450046001751333337363133-i
 THRESHOLD = 30
 
 
+def connect_pixhawk():
+	print("Waiting for Pixhawk heartbeat...")
+
+	while True:
+		try:
+			master = mavutil.mavlink_connection(
+				DRONE_PORT,
+				baud=115200
+			)
+
+			master.wait_heartbeat(timeout=60)
+			print("Pixhawk heartbeat received")
+
+			vehicle = connect(
+				DRONE_PORT,
+				baud=115200,
+				wait_ready=False
+			)
+
+			print("Connected to Pixhawk")
+			return vehicle
+
+		except Exception as e:
+			print(f"Pixhawk not ready: {e}")
+			time.sleep(3)
+
+
 def main():
 	ser = None
 	vehicle = None
@@ -19,15 +46,17 @@ def main():
 		time.sleep(2)
 		print("Connected to Arduino")
 
-		# Connect to drone
-		vehicle = connect(DRONE_PORT, wait_ready=True)
-		print("Connected to drone")
+		# Connect to Pixhawk
+		vehicle = connect_pixhawk()
 
-		vehicle.message_factory.statustext_send(mavutil.mavlink.MAV_SEVERITY_ALERT,b"Companion computer connected")
+		vehicle.message_factory.statustext_send(
+			mavutil.mavlink.MAV_SEVERITY_ALERT,
+			b"Companion computer connected"
+		)
 		vehicle.flush()
-		
+
 		while True:
-			line = ser.readline().decode('utf-8').strip()
+			line = ser.readline().decode("utf-8").strip()
 
 			if not line:
 				continue
@@ -45,7 +74,6 @@ def main():
 					print("MAVLink alert sent")
 
 			except ValueError:
-				# In case Arduino sends non-numeric data
 				print(f"Ignoring invalid data: {line}")
 
 	except KeyboardInterrupt:
