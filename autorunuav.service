@@ -1,11 +1,6 @@
 [Unit]
-Description=autorun arduino czujniki
-After=network.target \
-      dev-serial-by\x2did-usb-1a86_USB_Serial-if00-port0.device \
-      dev-serial-by\x2did-usb-Holybro_Pixhawk6C_450046001751333337363133-if00.device
-
-Wants=dev-serial-by\x2did-usb-1a86_USB_Serial-if00-port0.device \
-      dev-serial-by\x2did-usb-Holybro_Pixhawk6C_450046001751333337363133-if00.device
+Description=UAV Companion Autostart
+After=multi-user.target
 
 [Service]
 Type=simple
@@ -20,8 +15,6 @@ RestartSec=5
 
 StandardOutput=journal
 StandardError=journal
-
-TimeoutStartSec=60
 
 [Install]
 WantedBy=multi-user.target
