@@ -1,0 +1,196 @@
+\documentclass[a4paper,12pt]{book}
+
+
+\usepackage[T1,plmath]{polski}
+\usepackage[utf8]{inputenc} % w razie kłopotów spróbować: \usepackage[utf8x]{inputenc}
+\usepackage{fancyhdr} % nagłówki i stopki
+\usepackage{indentfirst} % WAŻNE, MA BYĆ!
+\usepackage[pdftex]{graphicx} % to do wstawiania rysunków
+\usepackage{amsfonts} % pakiety od AMS, ułatwiają składanie pewnych techniczno-matematcyznych rzeczy
+\usepackage{amsmath} % to do dodatkowych symboli, przydatne
+\usepackage{amssymb} % to też do dodatkowych symboli, też przydatne
+\usepackage{amsthm}
+\usepackage[pdftex,
+            left=1.1in,right=1.1in,
+            top=1.1in,bottom=1.1in]{geometry} % marginesy
+\usepackage{float}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{cite}
+
+\usepackage[colorlinks=true]{hyperref} % odnośniki interaktywne w PDFie
+\hypersetup{allcolors=blue} % odnośniki proszę zostawić kolorowe -- a jeśli ktoś nie lubi to zmienić na czarne dopiero w ostatniej wersji!
+\usepackage{listings}
+\lstset{
+    basicstyle=\footnotesize\tt,
+    numbers=left,
+    numberstyle=\tiny,
+    frame=tb,
+    tabsize=4,
+    columns=fixed,
+    showstringspaces=false,
+    showtabs=false,
+    keepspaces,
+    captionpos=t,    
+    commentstyle=\color{red},
+    keywordstyle=\color{blue}
+}
+\newfloat{lstfloat}{htbp}{lolst}[chapter]
+\floatname{lstfloat}{Listing}
+\def\lstfloatautorefname{Listing}
+
+% jesli potrzeba, można oczywiście wstawić inne pakiety i swoje definicje...
+
+
+
+% definicje nagłówków i stopek
+\pagestyle{fancy}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\fancyhf{}
+\fancyhead[LE,RO]{\footnotesize\bfseries\thepage}
+\fancyhead[LO]{\footnotesize\rightmark}
+\fancyhead[RE]{\footnotesize\leftmark}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0pt}
+\addtolength{\headheight}{1.5pt}
+\fancypagestyle{plain}{\fancyhead{}\cfoot{\footnotesize\bfseries\thepage}\renewcommand{\headrulewidth}{0pt}}
+
+
+% interlinia
+\linespread{1.25}
+
+\bibliographystyle{plain}
+
+\begin{document}
+\begin{titlepage}
+
+\begin{tabular}{c@{\hspace{21mm}}|@{\hspace{5mm}}l}
+\vspace{-20mm} & \\
+\multicolumn{2}{l}{\hspace{-12.5mm} \includegraphics[width=8cm]{LogoUMCS.jpg}} \\
+\multicolumn{2}{@{\hspace{20mm}}l}{\vspace{-4mm}} \\
+\multicolumn{2}{@{\hspace{28mm}}l}{\Large \sf UNIWERSYTET MARII
+	CURIE-SKŁODOWSKIEJ} \\
+\multicolumn{2}{@{\hspace{28mm}}l}{\vspace{-4mm}} \\
+\multicolumn{2}{@{\hspace{28mm}}l}{\Large \sf W LUBLINIE} \\
+\multicolumn{2}{@{\hspace{28mm}}l}{\vspace{-4mm}} \\
+\multicolumn{2}{@{\hspace{28mm}}l}{\Large \sf Wydział Matematyki, Fizyki i
+	Informatyki} \\
+\multicolumn{2}{@{\hspace{28mm}}l}{\vspace{21mm}} \\
+& {\sf Kierunek: \textbf{informatyka} } \\
+%& {\sf Specjalność: \textbf{informatyczna}} \\ % wpisujemy tylko jeśli jest!!!
+& \\\\\\
+& {\sf \large \bfseries Mateusz Kowal} \\
+& {\sf nr albumu: 318683} \\
+& \\\\\\
+& \Large \sf \bfseries Środowisko programowalnego \\
+& \Large \sf \bfseries  bezzałogowego statku powietrznego \\
+& \Large \sf \bfseries z~użyciem mikrokomputera Raspberry~Pi \\
+& {\large \sf A programmable unmanned aerial vehicle environment} \\
+& {\large \sf based on a Raspberry Pi microcomputer} \\
+& \\
+& \\
+& \\
+& {\sf Praca licencjacka}  \\
+& \vspace{-7mm} \\
+&  {\sf napisana w Katedrze Oprogramowania Systemów Informatycznych} \\
+&  {\sf Instytutu Informatyki i Matematyki UMCS} \\
+& \vspace{-7mm} \\
+& {\sf pod kierunkiem \bfseries dr hab. profesor uczelni Beaty Byliny} \\
+\multicolumn{2}{@{\hspace{28mm}}l}{\vspace{15mm}} \\
+\multicolumn{2}{@{\hspace{28mm}}l}{\textbf{\textsf{Lublin 2026}}}
+\end{tabular}
+\end{titlepage}
+
+
+\sloppy
+
+\thispagestyle{empty}
+
+\newpage{}
+
+\thispagestyle{empty}
+
+\newpage{}
+
+\tableofcontents{}
+
+\chapter*{Wstęp}
+\addcontentsline{toc}{chapter}{Wstęp} % ...ale w spisie treści ma być...
+\chaptermark{Wstęp} % ...i w paginie górnej
+
+Tu treść wstępu (który piszemy na końcu, po napisaniu całej pracy).
+
+\chapter{Wprowadzenie do bezzałogowych statków powietrznych}
+
+\section{Podstawowe pojęcia}
+
+Bezzałogowy statek powietrzny, skrót BSP, to kategoria pojazdów poruszających się w powietrzu 
+do której zaliczane są samoloty, śmigłowce i pojazdy wielowirnikowe (w tym drony), które 
+odbywają loty bez pilota na pokładzie i bez możliwości zabierania pasażerów. Sterowanie może 
+się odbywać zdalnie przez pilota naziemnego lub przez komputer, jeśli pojazd jest autonomiczny.\cite{web:easa:uavdef}
+
+Komputer pokładowy jest urządzeniem niezbędnym do działania BSP. Jego głównym zadaniem jest sterowanie silnikami pojazdu 
+oraz otrzymywanie i przetwarzanie sygnałów docierających z aparatury sterującej. W tym przypadku rolę komputera pokładowego pełni Pixhawk 6C.
+
+Komputer asystujący to komputer znajdujący się na pokładzie BSP, połączony z komputerem pokładowym. Jego rolą jest wykonywanie zadań, które są zbyt 
+skomplikowane obliczeniowo by móc powierzyć je komputerowi pokładowemu lub wymagają elementów przez komputer pokładowy nieposiadanych i niewspieranych. 
+Komputerem asystującym w przypadku tego projektu jest Raspberry Pi 5B.
+
+\section{Zadania i ograniczenia komputera pokładowego}
+        \subsection{Podstawowe zadania komputera pokładowego}
+        Rolą każdego komputera pokładowego jest przede wszystkim sterowanie silnikami pojazdu którego jest częścią. Komputer pokładowy musi więc posiadać odpowiednie 
+        interfejsy do komunikacji z silnikami oraz interfejs do otrzymywania poleceń. W przypadku komputerów pokładowych używanych w BSP wielowirnikowych niezbędny jest również żyroskop, 
+        dzięki któremu komputer pokładowy zna swoją pozycję i jest w stanie utrzymać pojazd poziomo lub odpowiednio odchylić go zgodnie z poleceniami które otrzyma.
+        \subsection{Opcjonalne zastosowania autopilota}
+        W zależności od modelu komputera pokładowego oraz zainstalowanego na nim oprogramowania może on dodatkowo obsługiwać wiele urządzeń peryferyjnych i posługiwać się bardziej złożoną logiką.
+        Przeciętny komputer pokładowy dostępny na rynku cywilnym oferuje możliwość podłączenia zewnętrznego modułu GPS czy kamery, a także samodzielnie przechowywać i wykonywać polecenia 
+        pozwalające na lot autonomiczny. Standardem jest również możliwość ustawienia procedury bezpieczeństwa (ang. failsafe) która decyduje jak zachowa się pojazd w razie utraty podłączenia
+        z kontrolerem naziemnym lub jakimkolwiek innym urządzeniem wydającym polecenia komputerowi pokładowemu.
+    \section{Rozszerzenie możliwości BSP dzięki komputerom asystującym}
+    Jeśli użytkownik chce wykorzystać swój BSP w bardziej nietypowy sposób, mogą stanąć mu na drodze ograniczenia sprzętowe. Komputery pokładowe oferują zazwyczaj niewielką moc obliczeniową
+    i ograniczoną ilość i różnorodność gniazd do podłączenia urządzeń peryferyjnych. Jednym ze sposobów przystosowania BSP do naszych wymagań jest użycie komputera asystującego który 
+    rozszerzy możliwości jednostki. Przykładowo, użytkownik może chcieć użyć swojego BSP do monitorowania dużego obszaru. W tym celu chciałby zamontować kamery z wielu stron, jednak 
+    użyty przez niego komputer pokładowy ma możliwość podpięcia tylko jednej kamery. Użycie komputera asystującego może być wtedy rozwiązaniem problemu. W zależności od użytego komputera 
+    asystującego można użyć nawet tak złożonych obliczeniowo programów jak sztuczna sieć neuronowa analizująca dane z urządzeń wejściowych i wydająca polecenia jednostce.
+    \chapter{Szczegóły techniczne zbudowanego środowiska}
+    % zdjęcie gotowego drona po zrobieniu obudowy
+    \section{Lista komponentów i ich specyfikacja}
+        \subsection{Rama BSP}
+        Rama użyta do zbudowania jednostki to Holybro S500 v2. Oferuje wbudowaną w konstrukcję kadłuba rozdzielnicę napięcia (ang. power distribution board) dostarczającą energię elektryczną
+        z akumulatora do silników. Miejscem na montaż silników są cztery ramiona wykonane z nylonu poliamidowego, wzmocnione w środku poprzez dodanie prętów z włókna węglowego. Całość 
+        opiera się na podwoziu z rurek z włókna węglowego połączonych plastikowymi łącznikami.
+        \subsection{Napęd}
+        Pojazd napędzany jest przez cztery silniki bezszczotkowe AIR2216II osiągające do 272W. Silniki bezszczotkowe wymagają zasilania prądem zmiennym trójfazowym, dlatego do ich działania 
+        potrzebne są moduły elektronicznej kontroli prędkości (ang. electronic speed controller). Moduły te otrzymują zasilanie prądem stałym z akumulatora oraz sygnał z komputera pokładowego 
+        sterujący prędkością obracania się silników. Następnie generuje prąd zmienny trójfazowy który wywołuje obrót silników. Moduły ESC zastosowane w zbudowanym pojeździe to BLHeli S 20A. 
+        Jednostka została wyposażona w śmigła T1045II o rozpiętości 260 milimetrów i szerokości do 30 milimetrów.
+        \begin{figure}[b!]
+        \begin{center}
+            \includegraphics[width=10cm]{X500MotorSpec_1024x1024.jpg}
+        \end{center}
+        \caption{Dokumentacja techniczna AIR2216II, BLHeli S 20A, T1045II. Źródło: \cite{web:holybro:naped:dok}}\label{rys:dok:naped}
+        \end{figure}
+        \subsection{Zewnętrzny moduł GNSS}
+        Zastosowany w jednostce zewnętrzny moduł GNSS to M10 od firmy Holybro. Oferuje jednoczesne otrzymywanie informacji od czterech największych 
+        systemów satelit geolokacyjnych: europejskich satelit Galileo, amerykańskich GPS, rosyjskich GLONASS i chińskich BeiDou.
+        \subsection{Układ komunikacji z pilotem (kontroler naziemny, odbiornik~radiowy, telemetria~+~mission~planner)}
+        \subsection{Komputer pokładowy}
+        \subsection{Komputer asystujący}
+        \subsection{Źródło zasilania}
+    \section{Specyfikacja drona (waga, czas lotu itp)}
+    \section{Wykorzystane oprogramowanie}
+        \subsection{Oprogramowanie komputera pokładowego}
+        \subsection{Oprogramowanie komputera asystującego}
+
+\chapter{Praktyczne zastosowanie środowiska}
+    \section{Wstępne założenia}
+    \section{Wykorzystane komponenty}
+    \section{Kod programu}
+
+\chapter{Potencjalne ścieżki rozwoju projektu}
+    \section{po jednym podrozdziale na każdy pomysł}
+\addcontentsline{toc}{chapter}{Bibliografia} % też ręczne dodanie do spisu treści, jak Wstęp
+\label{sec:bibliografia}
+\bibliography{MKowalBibliografia}
+
+\end{document}
