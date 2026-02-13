@@ -161,10 +161,30 @@ Komputerem asystującym w przypadku tego projektu jest Raspberry Pi 5B.
         opiera się na podwoziu z rurek z włókna węglowego połączonych plastikowymi łącznikami.
         \subsection{Napęd}
         Pojazd napędzany jest przez cztery silniki bezszczotkowe AIR2216II osiągające do 272W. Silniki bezszczotkowe wymagają zasilania prądem zmiennym trójfazowym, dlatego do ich działania 
-        potrzebne są moduły elektronicznej kontroli prędkości (ang. electronic speed controller). 
-        \subsection{Zewnętrzny moduł GPS}
-        \subsection{Układ komunikacji z pilotem (kontroler naziemny, odbiornik~radiowy, telemetria~+~mission~planner)}
+        potrzebne są moduły elektronicznej kontroli prędkości (ang. electronic speed controller). Moduły te otrzymują zasilanie prądem stałym z akumulatora oraz sygnał z komputera pokładowego 
+        sterujący prędkością obracania się silników. Następnie generuje prąd zmienny trójfazowy który wywołuje obrót silników. Moduły ESC zastosowane w zbudowanym pojeździe to BLHeli S 20A. 
+        Jednostka została wyposażona w śmigła T1045II o rozpiętości 260 milimetrów i szerokości do 30 milimetrów.
+        \begin{figure}[b!]
+        \begin{center}
+            \includegraphics[width=10cm]{X500MotorSpec_1024x1024.jpg}
+        \end{center}
+        \caption{Dokumentacja techniczna AIR2216II, BLHeli S 20A, T1045II. Źródło: ~\cite{web:holybro:naped:dok}}\label{rys:dok:naped}
+        \end{figure}
+        \subsection{Zewnętrzny moduł GNSS}
+        Zastosowany w jednostce zewnętrzny moduł GNSS to M10 od firmy Holybro. Oferuje jednoczesne otrzymywanie informacji od czterech największych 
+        systemów satelit geolokacyjnych: europejskich satelit Galileo, amerykańskich GPS, rosyjskich GLONASS i chińskich BeiDou. Oferowana dokładność wyznaczonej pozycji to 
+        2.0m CEP, co oznacza że co najmniej 50\% pomiarów wskaże pozycję oddaloną o 2 metry lub mniej od rzeczywistej pozycji.~\cite{web:holybro:m10gps}
+        \subsection{Układ komunikacji z pilotem}
+        BSP został przygotowany do utrzymywania dwóch rodzajów komunikacji z pilotem. Podstawowym kanałem komunikacji jest kontroler RadioMaster TX12 MKII pozwalający na zdalne 
+        sterowanie dronem wyposażonym w odbiornik radiowy RadioMaster RP4TD-M używając systemu ExpressLRS zapewniającego niezawodność i stabilność łącza nawet na dużych dystansach. 
+        Drugim kanałem komunikacji jest system telemetrii Holybro SiK Telemetry Radio V3 w wersji 433 MHz. Moduł podłączony do komputera osobistego znajdującego się na ziemi w pobliżu 
+        pilota pozwala na użycie aplikacji Mission Planner- oprogramowania pozwalającego między innymi na śledzenie BSP na mapie czy odczyt bieżących danych.~\cite{web:ardupilot:mission:planner}
         \subsection{Komputer pokładowy}
+        Rolę komputera pokładowego pełni Pixhawk 6C. Wyposażony jest w dwa procesory: STM32H743 — 480 MHz Cortex-M7 odpowiedzialny za działanie oprogramowania zainstalowanego na urządzeniu, 
+        odczyt parametrów z czujników, przetwarzanie informacji i przekazywanie poleceń dotyczących silników do drugiego procesora, w tym przypadku STM32F103 — 72 MHz Cortex-M3. Zadaniem 
+        drugiego procesora jest generowanie sygnałów PWM na podstawie otrzymanych sygnałów i przekazywanie ich do modułów ESC. W przypadku wystąpienia problemów z pierwszym procesorem 
+        jest w stanie samodzielnie generować sygnał sterujący silnikami jednak przez brak dostępu do czujników takich jak żyroskopy czy akcelerometry jego możliwości ograniczają się do 
+        utrzymania kręcenia się śmigieł w celu spowolnienia upadku i minimalizacji uszkodzeń przy lądowaniu awaryjnym.
         \subsection{Komputer asystujący}
         \subsection{Źródło zasilania}
     \section{Specyfikacja drona (waga, czas lotu itp)}
