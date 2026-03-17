@@ -144,7 +144,7 @@ Komputerem asystującym w przypadku tego projektu jest Raspberry Pi 5B.
         \subsection{Opcjonalne zastosowania autopilota}
         W zależności od modelu komputera pokładowego oraz zainstalowanego na nim oprogramowania może on dodatkowo obsługiwać wiele urządzeń peryferyjnych i posługiwać się bardziej złożoną logiką.
         Przeciętny komputer pokładowy dostępny na rynku cywilnym oferuje możliwość podłączenia zewnętrznego modułu GPS czy kamery, a także samodzielnie przechowywać i wykonywać polecenia 
-        pozwalające na lot autonomiczny. Standardem jest również możliwość ustawienia procedury bezpieczeństwa (ang. failsafe) która decyduje jak zachowa się pojazd w razie utraty podłączenia
+        pozwalające na lot autonomiczny. Standardem jest również możliwość ustawienia procedury bezpieczeństwa \textit{(ang. failsafe)} która decyduje jak zachowa się pojazd w razie utraty podłączenia
         z kontrolerem naziemnym lub jakimkolwiek innym urządzeniem wydającym polecenia komputerowi pokładowemu.
     \section{Rozszerzenie możliwości BSP dzięki komputerom asystującym}
     Jeśli użytkownik chce wykorzystać swój BSP w bardziej nietypowy sposób, mogą stanąć mu na drodze ograniczenia sprzętowe. Komputery pokładowe oferują zazwyczaj niewielką moc obliczeniową
@@ -156,12 +156,12 @@ Komputerem asystującym w przypadku tego projektu jest Raspberry Pi 5B.
     % zdjęcie gotowego drona po zrobieniu obudowy
     \section{Lista komponentów i ich specyfikacja}
         \subsection{Rama BSP}
-        Rama użyta do zbudowania jednostki to Holybro S500 v2. Oferuje wbudowaną w konstrukcję kadłuba rozdzielnicę napięcia (ang. power distribution board) dostarczającą energię elektryczną
+        Rama użyta do zbudowania jednostki to Holybro S500 v2. Oferuje wbudowaną w konstrukcję kadłuba rozdzielnicę napięcia \textit{(ang. power distribution board)} dostarczającą energię elektryczną
         z akumulatora do silników. Miejscem na montaż silników są cztery ramiona wykonane z nylonu poliamidowego, wzmocnione w środku poprzez dodanie prętów z włókna węglowego. Całość 
         opiera się na podwoziu z rurek z włókna węglowego połączonych plastikowymi łącznikami.
         \subsection{Napęd}
         Pojazd napędzany jest przez cztery silniki bezszczotkowe AIR2216II osiągające do 272W. Silniki bezszczotkowe wymagają zasilania prądem zmiennym trójfazowym, dlatego do ich działania 
-        potrzebne są moduły elektronicznej kontroli prędkości (ang. electronic speed controller). Moduły te otrzymują zasilanie prądem stałym z akumulatora oraz sygnał z komputera pokładowego 
+        potrzebne są moduły elektronicznej kontroli prędkości \textit{(ang. electronic speed controller)}. Moduły te otrzymują zasilanie prądem stałym z akumulatora oraz sygnał z komputera pokładowego 
         sterujący prędkością obracania się silników. Następnie generuje prąd zmienny trójfazowy który wywołuje obrót silników. Moduły ESC zastosowane w zbudowanym pojeździe to BLHeli S 20A. 
         Jednostka została wyposażona w śmigła T1045II o rozpiętości 260 milimetrów i szerokości do 30 milimetrów.
         \begin{figure}[b!]
@@ -185,8 +185,16 @@ Komputerem asystującym w przypadku tego projektu jest Raspberry Pi 5B.
         drugiego procesora jest generowanie sygnałów PWM na podstawie otrzymanych sygnałów i przekazywanie ich do modułów ESC. W przypadku wystąpienia problemów z pierwszym procesorem 
         jest w stanie samodzielnie generować sygnał sterujący silnikami jednak przez brak dostępu do czujników takich jak żyroskopy czy akcelerometry jego możliwości ograniczają się do 
         utrzymania kręcenia się śmigieł w celu spowolnienia upadku i minimalizacji uszkodzeń przy lądowaniu awaryjnym.
+
+        Do poprawnego sterowania pojazdem wymagane są również odpowiednie czujniki. Pixhawk 6C posiada dwa urządzenia łączące w sobie akcelerometry i żyroskopy: ICM-42688-P i BMI055. 
+        Użycie dwóch urządzeń i porównanie ich odczytów ze sobą pozwala na wykrycie niedokładności lub uszkodzenia jednego z nich i zapobiega destabilizacji drona w przypadku awarii. 
+        W razie uszkodzenia komputer pokładowy może wdrożyć procedurę bezpieczeństwa i bezpiecznie ją wykonać polegając na pozostałym działającym czujniku. Pixhawk 6C wyposażony jest również w 
+        magnetometr IST8310 pozwalający na określenie jego pozycji na podstawie pola magnetycznego Ziemi oraz barometr MS5611 pozwalający obliczyć wysokość nad ziemią na podstawie różnicy ciśnień.~\cite{web:pixhawk6c:specs}
         \subsection{Komputer asystujący}
+        Asystentem dla Pixhawk 6C jest mikrokomputer Raspberry Pi 5B. Posiada on czterordzeniowy procesor Arm Cortex-A76, 8GB RAM oraz szereg sposobów na podłączenie urządzeń 
+        peryferyjnych, np. cztery gniazda USB czy 40 pinów GPIO.
         \subsection{Źródło zasilania}
+        BSP zasilany jest za pomocą akumulatora litowo-jonowego Gens Ace G-Tech o pojemności 5000 mAh, napięciu 14.8V i wadze 439g.
     \section{Specyfikacja drona (waga, czas lotu itp)}
     \section{Wykorzystane oprogramowanie}
         \subsection{Oprogramowanie komputera pokładowego}
