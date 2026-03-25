@@ -5,7 +5,7 @@ from pymavlink import mavutil
 from gpiozero import Device, DistanceSensor
 from gpiozero.pins.lgpio import LGPIOFactory
 
-Device.pin_factory = LGPIOFactory() #nie ruszać bo na nowych razberkach nie działa inaczej
+Device.pin_factory = LGPIOFactory()
 
 DRONE_PORT = "/dev/serial/by-id/usb-Holybro_Pixhawk6C_450046001751333337363133-if00"
 THRESHOLD = 30   #w centymetrach
