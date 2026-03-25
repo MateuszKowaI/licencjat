@@ -10,7 +10,7 @@ Device.pin_factory = LGPIOFactory()
 DRONE_PORT = "/dev/serial/by-id/usb-Holybro_Pixhawk6C_450046001751333337363133-if00"
 THRESHOLD = 30   #w centymetrach
 GAP = 0.05       #50ms
-MAX_DIST = 5     #w metrach
+MAX_DIST = 8     #w metrach
 
 sensor1 = DistanceSensor(echo=17, trigger=23, max_distance=MAX_DIST)
 sensor2 = DistanceSensor(echo=27, trigger=24, max_distance=MAX_DIST)
