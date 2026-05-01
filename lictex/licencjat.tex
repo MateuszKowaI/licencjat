@@ -172,7 +172,7 @@ Komputerem asystującym w przypadku tego projektu jest Raspberry Pi 5B.
         \end{figure}
         \subsection{Zewnętrzny moduł GNSS}
         Zastosowany w jednostce zewnętrzny moduł GNSS to M10 od firmy Holybro. Oferuje jednoczesne otrzymywanie informacji od czterech największych 
-        systemów satelit geolokacyjnych: europejskich satelit Galileo, amerykańskich GPS, rosyjskich GLONASS i chińskich BeiDou. Oferowana dokładność wyznaczonej pozycji to 
+        systemów satelit geolokacyjnych: europejskich satelit Galileo, amerykańskich GPS, rosyjskich GLONASS i chińskich Bei Dou. Oferowana dokładność wyznaczonej pozycji to 
         2.0m CEP, co oznacza że co najmniej 50\% pomiarów wskaże pozycję oddaloną o 2 metry lub mniej od rzeczywistej pozycji.~\cite{web:holybro:m10gps}
         \subsection{Układ komunikacji z pilotem}
         BSP został przygotowany do utrzymywania dwóch rodzajów komunikacji z pilotem. Podstawowym kanałem komunikacji jest kontroler RadioMaster TX12 MKII pozwalający na zdalne 
@@ -183,23 +183,52 @@ Komputerem asystującym w przypadku tego projektu jest Raspberry Pi 5B.
         Rolę komputera pokładowego pełni Pixhawk 6C. Wyposażony jest w dwa procesory: STM32H743 — 480 MHz Cortex-M7 odpowiedzialny za działanie oprogramowania zainstalowanego na urządzeniu, 
         odczyt parametrów z czujników, przetwarzanie informacji i przekazywanie poleceń dotyczących silników do drugiego procesora, w tym przypadku STM32F103 — 72 MHz Cortex-M3. Zadaniem 
         drugiego procesora jest generowanie sygnałów PWM na podstawie otrzymanych sygnałów i przekazywanie ich do modułów ESC. W przypadku wystąpienia problemów z pierwszym procesorem 
-        jest w stanie samodzielnie generować sygnał sterujący silnikami jednak przez brak dostępu do czujników takich jak żyroskopy czy akcelerometry jego możliwości ograniczają się do 
+        jest w stanie samodzielnie generować sygnał sterujący silnikami, jednak przez brak dostępu do czujników takich jak żyroskopy czy akcelerometry jego możliwości ograniczają się do 
         utrzymania kręcenia się śmigieł w celu spowolnienia upadku i minimalizacji uszkodzeń przy lądowaniu awaryjnym.
 
         Do poprawnego sterowania pojazdem wymagane są również odpowiednie czujniki. Pixhawk 6C posiada dwa urządzenia łączące w sobie akcelerometry i żyroskopy: ICM-42688-P i BMI055. 
         Użycie dwóch urządzeń i porównanie ich odczytów ze sobą pozwala na wykrycie niedokładności lub uszkodzenia jednego z nich i zapobiega destabilizacji drona w przypadku awarii. 
         W razie uszkodzenia komputer pokładowy może wdrożyć procedurę bezpieczeństwa i bezpiecznie ją wykonać polegając na pozostałym działającym czujniku. Pixhawk 6C wyposażony jest również w 
         magnetometr IST8310 pozwalający na określenie jego pozycji na podstawie pola magnetycznego Ziemi oraz barometr MS5611 pozwalający obliczyć wysokość nad ziemią na podstawie różnicy ciśnień.~\cite{web:pixhawk6c:specs}
+        Oprogramowaniem działającym na komputerze pokładowym jest ArduCopter w wersji 4.6.2.
         \subsection{Komputer asystujący}
-        Asystentem dla Pixhawk 6C jest mikrokomputer Raspberry Pi 5B. Posiada on czterordzeniowy procesor Arm Cortex-A76, 8GB RAM oraz szereg sposobów na podłączenie urządzeń 
-        peryferyjnych, np. cztery gniazda USB czy 40 pinów GPIO.
+        Asystentem dla Pixhawk 6C jest mikrokomputer Raspberry Pi 5B. Posiada on czterordzeniowy procesor Arm Cortex-A76, 8GB pamięci RAM oraz szereg sposobów na podłączenie urządzeń 
+        peryferyjnych, np. cztery gniazda USB czy 40 pinów GPIO. Zainstalowany na nim system operacyjny to Raspberry Pi OS będący portem Debiana Trixie.
         \subsection{Źródło zasilania}
-        BSP zasilany jest za pomocą akumulatora litowo-jonowego Gens Ace G-Tech o pojemności 5000 mAh, napięciu 14.8V i wadze 439g.
-    \section{Specyfikacja drona (waga, czas lotu itp)}
-    \section{Wykorzystane oprogramowanie}
-        \subsection{Oprogramowanie komputera pokładowego}
-        \subsection{Oprogramowanie komputera asystującego}
+        BSP zasilany jest za pomocą akumulatora litowo-jonowego Gens Ace G-Tech o pojemności 5000 mAh, napięciu 14.8V i wadze 439g. Za zasilanie komputera asystującego odpowiedzialny jest powerbank z baterią litowo-polimerową
+         o pojemności 10000 mAh, napięciu 5V i mocy maksymalnej 22,5W, wadze 235g. Możliwe jest zasilenie Raspberry Pi akumulatorem drona, wiąże się to jednak z ingerencją w gotowy układ zasilania oraz obniżenia napięcia z 14.8V do 5V. Problem 
+         stanowią również silniki elektryczne napędzające jednostkę, ich zużycie prądu zmienia się bardzo dynamicznie co stwarza ryzyko spadku napięcia zasilającego komputer asystujący poniżej wymaganych 5V. W przypadku Raspberry Pi 
+        spadek napięcia poniżej 4,63V (±5\%) może skutkować obniżoną wydajnością komputera, nieprawidłowym działaniem podłączonych urządzeń peryferyjnych lub do nieprzewidywalnego zachowania urządzenia czy uszkodzenia danych na karcie pamięci.~\cite{web:raspberry:pi:documentation:power:supply} 
+        Z uwagi na potencjalne problemy i konieczność ingerencji w gotowy układ zasilania zastosowane zostało oddzielne źródło prądu dla komputera asystującego.
 
+    \section{Specyfikacja drona}
+        Waga jednostki, wliczając w to komputer asystujący i jego źródło zasilania, wynosi 1715g. Na podstawie wagi, specyfikacji silników~\cite{web:holybro:naped:dok} oraz akumulatora można oszacować średni możliwy czas lotu. 
+        Aby dron zawisł w bezruchu, każdy z czterech silników musi wytworzyć ok. 428,75g ciągu. Dzięki dokumentacji wiadomo że jeden silnik z zastosowanymi dołączonym w zestawie śmigłem potrzebuje 2,86A do wytworzenia 373g ciągu i 
+        3,60A dla 447g ciągu. Prąd potrzebny do wytworzenia dokładnie 428,75g ciągu może być obliczony z użyciem interpolacji liniowej:
+        \[
+        I = I_1 + \frac{T - T_1}{T_2 - T_1}(I_2 - I_1)
+        \]
+
+        \[
+        I = 2.86 + \frac{428.75 - 373}{447 - 373}(3.60 - 2.86)
+        \]
+
+        \[
+        I = 2.86 + \frac{55.75}{74} \cdot 0.74
+        \]
+
+        \[
+        I = 2.86 + 0.5575
+        \]
+
+        \[
+        I \approx 3.42\ \text{A}
+        \]
+        Jeden silnik potrzebuje około 3,42A, co dla czterech silników daje łącznie 13,67A. Używając akumulatora o pojemności 5000 mAh daje nam to teoretyczne 21,95 minut lotu. Biorąc pod uwagę dodatkowe zużycie prądu przez komputer pokładowy oraz 
+        zwiększone zużycie prądu przy wznoszeniu i manewrowaniu bezpieczniejszym będzie przyjęcie marginesu błędu i określenie czasu lotu na około 19-20 minut. Oszacowanie maksymalnego czasu działania Raspberry Pi jest dużo trudniejsze, 
+        zależy to w dużym stopniu od złożoności programów na niej uruchomionych. Artykuł ogłaszający wypuszczenie na rynek Raspberry Pi 5 w wersji z 16GB pamięci RAM określa zużycie w spoczynku na 2-3W~\cite{web:raspberry:pi5:release:announcement}, 
+        zakładając zużycie 3W przy 10000 mAh i 5V daje to około 16,7 godzin działania. Trzeba jednak wziąć pod uwagę że to ogłoszenie nie jest tak wiarygodnym źródłem jak oficjalna dokumentacja, która w tym przypadku nie wspomina o poborze mocy 
+        w stanie spoczynku. Pobór prądu w praktyce będzie też większy ze względu na uruchomione na mikrokomputerze programy. Bez pomiaru poboru prądu podczas działania konkretnych programów nie da się niezawodnie oszacować czasu działania na jednym ładowaniu.
 \chapter{Praktyczne zastosowanie środowiska}
     \section{Wstępne założenia}
     \section{Wykorzystane komponenty}
