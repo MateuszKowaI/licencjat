@@ -231,10 +231,105 @@ Komputerem asystującym w przypadku tego projektu jest Raspberry Pi 5B.
         w stanie spoczynku. Pobór prądu w praktyce będzie też większy ze względu na uruchomione na mikrokomputerze programy. Bez pomiaru poboru prądu podczas działania konkretnych programów nie da się niezawodnie oszacować czasu działania na jednym ładowaniu.
 \chapter{Zastosowanie środowiska}
     \section{Wstępne założenia}
-        Komputer Raspberry Pi jest połączony z Pixhawk 6C za pomocą USB. W katalogu uavcompanion znajduje się wirtualne środowisko python oraz wszystkie programy współpracujące z dronem. Komunikacja z dronem możliwa jest dzięki bibliotekom DroneKit 2.9.2 i PyMAVLink 2.4.49. 
-        Użycie tych bibliotek ogranicza wersję pythona do nie nowszej niż 3.9.18 ponieważ od jakiegoś czasu są one nieutrzymywane. Za pomocą komendy \texttt{source uavcompanion/bin/activate}
-        uruchamiane jest wirtualne środowisko. Wewnątrz środowiska można testować napisane programy i instalować wymagane biblioteki. K
+        Komputer Raspberry Pi jest połączony z Pixhawk 6C za pomocą USB. W katalogu uavproject znajduje się wirtualne środowisko python oraz wszystkie programy współpracujące z dronem. Komunikacja z dronem możliwa jest dzięki bibliotekom DroneKit 2.9.2 i PyMAVLink 2.4.49. 
+        Użycie tych bibliotek ogranicza wersję pythona do nie nowszej niż 3.9.18 ponieważ od jakiegoś czasu są one nieutrzymywane. Za pomocą komendy \texttt{source uavproject/bin/activate}
+        uruchamiane jest wirtualne środowisko. Wewnątrz środowiska można testować napisane programy i instalować wymagane biblioteki. Pisanie programu najlepiej zacząć używając szablonu ~\ref{lst:szablon}.
+        \begin{lstlisting}[language=python, caption={Szablon programu działającego na komputerze asystującym}, label={lst:szablon}]
+from dronekit import connect
+from pymavlink import mavutil
+import os
+import time
+
+DRONE_PORT = "/dev/serial/by-id/usb-Holybro_Pixhawk6C_450046001751333337363133-if00"
+
+def connect_pixhawk():
+
+    print("Waiting for Pixhawk heartbeat...")
+
+    while True:
+        try:
+            master = mavutil.mavlink_connection(
+                DRONE_PORT,
+                baud=115200
+            )
+
+            master.wait_heartbeat(timeout=60)
+            print("Pixhawk heartbeat received")
+
+            vehicle = connect(
+                DRONE_PORT,
+                baud=115200,
+                wait_ready=False
+            )
+
+            print("Connected to Pixhawk")
+            return vehicle
+
+        except Exception as e:
+            print(f"Pixhawk not ready: {e}")
+            time.sleep(3)
+def main():
+    vehicle = None
+
+    while not os.path.exists(DRONE_PORT):
+        time.sleep(1)
+    try:
+        vehicle = connect_pixhawk()
+
+        vehicle.message_factory.statustext_send(
+            mavutil.mavlink.MAV_SEVERITY_ALERT,
+            b"Companion computer connected"
+        )
+        vehicle.flush()
+
+        #miejsce na kod
+
+    except KeyboardInterrupt:
+        print("\nProgram interrupted by user.")
+
+    finally:
+        print("Closing connections...")
+
+        if vehicle:
+            vehicle.close()
+            print("Drone connection closed")
+
+
+if __name__ == "__main__":
+    main()
+        \end{lstlisting}
+
         
+        Najważniejszym jego elementem jest funkcja \texttt{connect\_pixhawk()} otwierająca połączenie z komputerem pokładowym. Pierwszym etapem jest użycie biblioteki PyMAVLink do nasłuchiwania sygnału \textit{heartbeat}. Sygnał ten jest wysyłany przez komputer pokładowy w momencie gdy ten jest 
+        uruchomiony i gotowy do pracy. Po otrzymaniu sygnału tworzone jest drugie połączenie z użyciem biblioteki DroneKit, które jest zwracane i może być użyte do komunikacji z dronem w dalszej części programu. Program, używając otwartego połączenia, wywołuje wysłanie wiadomości przez komputer Pixhawk 
+        o pomyślnym podłączeniu komputera asystującego. Wiadomość może być odczytana przez pilota mającego połączenie z jednostką dzięki aplikacji Mission Planner. Szablon uwzględnia również poprawne zamknięcie połączenia, niezależnie od sposobu zakończenia działania programu. W przypadku zatrzymania programu 
+        używając skrótu klawiszowego połączenie nie jest poprawnie zamykane, przez co uruchamianie programów więcej niż raz jest niemożliwe. Bez zamknięcia połączenia każda kolejna próba zakończy się błędem, ponieważ urządzenie bez poprawnie zamkniętego połączenia będzie oznaczone jako zajęte i niedostępne.\par 
+        Loty dronem najczęściej nie odbywają się w warunkach domowych, dlatego programy powinny się wykonywać automatycznie, bez potrzeby użycia klawiatury i monitora. W tym celu wykorzystany został skrypt ~\ref{lst:autorunuav} zapisany w \texttt{/etc/systemd/system/autorunuav.service}. Po uruchomieniu Raspberry Pi 
+        skrypt poczeka aż system będzie w pełni uruchomiony, po czym wykona program określony w parametrze \texttt{ExecStart} przy użyciu wirtualnego środowiska. W przypadku jeśli program przestanie działać skrypt odczeka pięć sekund i uruchomi go ponownie. Po każdej zmianie automatycznie uruchamianego programu lub 
+        jakichkolwiek innych zmian w skrypcie należy odświeżyć systemd komendą \texttt{sudo systemctl daemon-reload} oraz uruchomić skrypt za pomocą \texttt{sudo systemctl start autorunuav.service}. Wyjście programu można zobaczyć używając komendy \texttt{journalctl -u autorunuav.service -f}.
+
+        \begin{lstlisting}[language=bash, caption={Skrypt wykonujący program po uruchomieniu komputera asystującego}, label={lst:autorunuav}]
+[Unit]
+Description=UAV Companion Autostart
+After=multi-user.target
+
+[Service]
+Type=simple
+User=uavcompanion
+Group=uavcompanion
+
+WorkingDirectory=/home/uavcompanion/uavproject
+ExecStart=/home/uavcompanion/uavproject/venv/bin/python -u program.py
+
+Restart=on-failure
+RestartSec=5
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+        \end{lstlisting}
     \section{Wykorzystane komponenty}
     \section{Kod programu}
 
