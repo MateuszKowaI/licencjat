@@ -330,6 +330,14 @@ StandardError=journal
 [Install]
 WantedBy=multi-user.target
         \end{lstlisting}
+
+    \section{Przykład użycia}
+        W celu przetestowania zbudowanej platformy i zaprezentowania jednej z możliwości jej wykorzystania zbudowano system ostrzegania przed kolizją. 
+        Wykrywanie przeszkód odbywa się z użyciem trzech ultradźwiękowych czujników odległości HC-SR04\cite{web:HC-SR04:manual}. Zasilanie 5V oraz uziemienie są 
+        połączone równolegle do pinów w Raspberry Pi. Piny TRIG w czujnikach, wywołujące pomiar, są podłączone bezpośrednio do pinów GPIO. Wyjście ECHO czujników nie może być podłączone 
+        do Raspberry Pi ze względu na różnicę w napięciach. W czujnikach HC-SR04 dla sygnału wychodzącego przez pin ECHO stan wysoki to 5V. Takie napięcie jest odpowiednie dla mikrokomputera Arduino, 
+        jednak stan wysoki dla pinów w Raspberry Pi to 3,3V. Aby zapobiec uszkodzeniom należy obniżyć napięcie wychodzące z czujnika do bezpiecznych 3,3V, co zostało osiągnięte z użyciem 
+        konwertera poziomów logicznych. Zaprojektowane i wydrukowane na drukarce 3D uchwyty pozwalają na zamontowanie czujników i konwertera na dronie oraz regulację ich pozycji w poziomie.
     \section{Wykorzystane komponenty}
     \section{Kod programu}
 
