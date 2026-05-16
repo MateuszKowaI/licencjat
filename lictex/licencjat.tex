@@ -338,8 +338,173 @@ WantedBy=multi-user.target
         do Raspberry Pi ze względu na różnicę w napięciach. W czujnikach HC-SR04 dla sygnału wychodzącego przez pin ECHO stan wysoki to 5V. Takie napięcie jest odpowiednie dla mikrokomputera Arduino, 
         jednak stan wysoki dla pinów w Raspberry Pi to 3,3V. Aby zapobiec uszkodzeniom należy obniżyć napięcie wychodzące z czujnika do bezpiecznych 3,3V, co zostało osiągnięte z użyciem 
         konwertera poziomów logicznych. Zaprojektowane i wydrukowane na drukarce 3D uchwyty pozwalają na zamontowanie czujników i konwertera na dronie oraz regulację ich pozycji w poziomie.
-    \section{Wykorzystane komponenty}
+        Program ~\ref{lst:colPrevention} wywołuje wysłanie ostrzeżenia do pilota w przypadku jeśli wykryta zostanie przeszkoda oraz dron zbliża się do niej z odpowiednią prędkością. 
+        Zmienne globalne na początku programu określają między innymi minimalną odległość i prędkość przy których program powinien wywołać ostrzeżenie, wymaga również określenia kątów pod jakimi 
+        ustawione są czujniki. Wartość 0 oznacza czujnik zwrócony na wprost, wartości ujemne oznaczają odchylenie w lewo a wartości dodatnie oznaczają odchylenie w prawo. Dla wygody użytkownika 
+        kąty wyrażone są w stopniach. Po ustanowieniu połączenia z komputerem pokładowym program w nieskończonej pętli odczytuje odległości z czujników, zostawiając przerwę między odczytami równą 
+        wartości określonej w zmiennej \texttt{GAP}. W przypadku użycia wielu czujników obok siebie istnieje ryzyko że po wywołaniu pomiaru u jednego z czujników, przejdziemy do drugiego zanim poprzedni 
+        zakończy pomiar. W takiej sytuacji może się zdarzyć że fala ultradźwiękowa wysłana przez poprzedni czujnik dotrze do kolejnego, co skutkować będzie zaburzonym pomiarem i fałszywie krótkim zmierzonym dystansem. 
+        Ryzyko wystąpienia takiego problemu jest największe gdy czujniki zwrócone są w tę samą stronę, w przypadku zbudowanego systemu ostrzegania ryzyko zaburzenia pomiaru z tego powodu jest znikome. 
+        Mimo wszystko pozostawienie odstępu jest wskazane, a odstęp 50ms nie jest wystarczająco długi aby uczynić program zawodnym przez zbyt rzadkie pomiary. Każda wartość pomiaru zwracana jest w postaci liczby 
+        zmiennoprzecinkowej pomiędzy 0 a 1, gdzie 0 oznacza 0cm a 1 oznacza maksymalną odległość pomiaru określaną w zmiennej \texttt{MAX\_DIST}. Wartość pomiaru jest mnożona przez 100 i maksymalną odległość pomiaru w celu 
+        uzyskania wartości w centymetrach. Komputer Pixhawk dostarcza programowi informacji o prędkości drona i jego odchyleniu od kierunku północnego. Prędkość drona jest wyrażona w postaci trzech wartości: prędkości w kierunku północnym, 
+        wschodnim i w dół. Dzięki odchyleniu od kierunku północnego obliczana jest prędkość względem BSP. Program następnie oblicza prędkość względem danego czujnika, wykorzystując określony wcześniej kąt jego odchylenia względem przodu. 
+        Mając te dane program porównuje odczytaną z czujników odległość z określonym progiem aktywacji oraz obecną prędkość w kierunku w który skierowany jest czujnik z minimalną prędkością aktywującą ostrzeżenie. 
+        Jeśli odległość jest mniejsza a prędkość większa niż punkty aktywacji, program wywoła wysłanie ostrzeżenia.
+
     \section{Kod programu}
+\begin{lstlisting}[language=python, caption={Program ostrzegający przed kolizją}, label={lst:colPrevention}]
+import time
+import math
+from dronekit import connect
+from pymavlink import mavutil
+
+from gpiozero import Device, DistanceSensor
+from gpiozero.pins.lgpio import LGPIOFactory
+
+Device.pin_factory = LGPIOFactory()
+
+DRONE_PORT = "/dev/serial/by-id/usb-Holybro_Pixhawk6C_450046001751333337363133-if00"
+
+MIN_DISTANCE_CM = 30
+MIN_SPEED = 0.3 # w m/s
+GAP = 0.05 # 50ms
+MAX_DIST = 8
+
+SENSOR_ANGLES_DEG = {
+    1: -45.0,
+    2: 0.0,
+    3: 45.0
+}
+
+sensor1 = DistanceSensor(echo=17, trigger=23, max_distance=MAX_DIST)
+sensor2 = DistanceSensor(echo=27, trigger=24, max_distance=MAX_DIST)
+sensor3 = DistanceSensor(echo=22, trigger=25, max_distance=MAX_DIST)
+
+
+def connect_pixhawk():
+    while True:
+        try:
+            conn = mavutil.mavlink_connection(
+                DRONE_PORT,
+                baud=115200
+            )
+
+            conn.wait_heartbeat(timeout=60)
+            conn.close()
+
+            vehicle = connect(
+                DRONE_PORT,
+                baud=115200,
+                wait_ready=True
+            )
+
+            return vehicle
+
+        except Exception:
+            time.sleep(3)
+
+
+def get_body_velocity(vehicle):
+    velocity = vehicle.velocity
+    yaw = vehicle.attitude.yaw
+
+    if velocity is None or yaw is None:
+        return 0.0, 0.0
+
+    vn, ve, _ = velocity
+
+    v_forward = vn * math.cos(yaw) + ve * math.sin(yaw)
+    v_right = -vn * math.sin(yaw) + ve * math.cos(yaw)
+
+    return v_forward, v_right
+
+
+def get_speed_toward_sensor(v_forward, v_right, sensor_angle_deg):
+    angle_rad = math.radians(sensor_angle_deg)
+    return v_forward * math.cos(angle_rad) + v_right * math.sin(angle_rad)
+
+
+def send_alert(vehicle):
+    message = "obstacle"
+
+    vehicle.message_factory.statustext_send(
+        mavutil.mavlink.MAV_SEVERITY_ALERT,
+        message.encode("utf-8")
+    )
+    vehicle.flush()
+
+
+def check_distance(vehicle, distance_cm, sensor_id, v_forward, v_right):
+    sensor_angle = SENSOR_ANGLES_DEG[sensor_id]
+    toward_speed = get_speed_toward_sensor(v_forward, v_right, sensor_angle)
+
+    if distance_cm < MIN_DISTANCE_CM and toward_speed > MIN_SPEED:
+        send_alert(vehicle)
+
+
+def main():
+    vehicle = None
+
+    try:
+        vehicle = connect_pixhawk()
+
+        vehicle.message_factory.statustext_send(
+            mavutil.mavlink.MAV_SEVERITY_ALERT,
+            b"Companion computer connected"
+        )
+        vehicle.flush()
+
+        while True:
+            v_forward, v_right = get_body_velocity(vehicle)
+
+            d1 = sensor1.distance * 100 * MAX_DIST
+            check_distance(vehicle, d1, 1, v_forward, v_right)
+            time.sleep(GAP)
+
+            d2 = sensor2.distance * 100 * MAX_DIST
+            check_distance(vehicle, d2, 2, v_forward, v_right)
+            time.sleep(GAP)
+
+            d3 = sensor3.distance * 100 * MAX_DIST
+            check_distance(vehicle, d3, 3, v_forward, v_right)
+            time.sleep(GAP)
+
+    except KeyboardInterrupt:
+        pass
+
+    finally:
+        if vehicle:
+            vehicle.close()
+
+
+if __name__ == "__main__":
+    main()
+        \end{lstlisting}
+
+    \section{Alternatywne warianty projektu}
+        W trakcie pracy nad systemem zapobiegającym kolizjom powstały alternatywne rozwiązania i pomysły które nie trafiły do końcowej wersji. 
+        Przykładowo program biorący pod uwagę prędkość drona przy decydowaniu o wysłaniu ostrzeżenia został napisany na podstawie wersji sprawdzającej 
+        jedynie odległość od przeszkody. W zależności od preferencji użytkownika uzależnienie ostrzeżeń od prędkości może być niepożądane.\par
+        Problem z różnicą napięć między stanem wysokim dla czujników odległości a stanem wysokim dla pinów GPIO w Raspberry Pi może być rozwiązany 
+        na inne sposoby niż z życiem konwertera stanów logicznych. Istnieje możliwość stworzenia dzielnika napięcia z pomocą dwóch odpowiednio dobranych rezystorów. 
+        Z powodu braku takowych pod ręką ta możliwość nie została jednak przetestowana. Podczas prac, aby przyspieszyć budowę platformy i przejść do oprogramowania, 
+        czujniki odległości zostały podłączone do Arduino Nano. Wywoływanie pomiarów i obliczanie na ich podstawie zmierzonej odległości odbywało się na mikrokontrolerze, a wyniki 
+        przesyłane były do Raspberry Pi dzięki połączeniu USB. Takie rozwiązanie wprowadza jednak niepotrzebnie dodatkowe urządzenie do układu oraz zwiększa jego zużycie energii przez 
+        konieczność zasilenia mikrokontrolera. W przypadku gdy Raspberry Pi będzie działać z niedostatecznym zasilaniem może ograniczyć prąd idący do urządzeń połączonych przez USB do 600mA~\cite{web:raspberry:pi:documentation:power:supply}, 
+        w przypadku Arduino Nano takie ograniczenie nie stanowi jednak problemu ponieważ prąd wymagany do jego działania jest znacznie niższy. Użycie Raspberry Pi oraz Arduino komplikuje 
+        pracę nad oprogramowaniem; Do działającego systemu trzeba napisania dwóch programów w dwóch różnych językach, oddzielnie dla obu z urządzeń. Z powodu wymienionych wad 
+        użycia Arduino zostało ono zastąpione konwerterem stanów logicznych w późniejszych etapach rozwoju, pozostaje on jednak możliwym rozwiązaniem.\par
+        Użyte w tym przypadku ultradźwiękowe czujniki odległości nie są idealnymi urzadzeniami pomiarowymi. Wykorzystanie fali dźwiękowej odbijającej się od przeszkody do 
+        określenia odległości wiąże się z ograniczeniami i podatnościami. Fala dźwiękowa, padająca na przeszkodę, odbije się różnie w zależności od jej materiału i kształtu. 
+        Dobrze wygłuszający materiał taki jak grube płótno czy gąbka może zostać niewykryty przez czujnik ultradźwiękowy. Czujniki wykorzystujące ultradźwięki mają również problem 
+        z wykrywaniem przeszkód ustawionych pod zbyt dużym kątem. Idealne warunki pomiarowe to przeszkoda ustawiona prostopadle do czujnika, dla HC-SR04 dopuszczalne odchylenie to 15\textdegree~\cite{web:HC-SR04:manual}. 
+        Naukowcy Manabu Ishihara, Makoto Shiina i Shin-nosuke Suzuki przeprowadzili szereg eksperymentów z użyciem czujnika ultradźwiękowego~\cite{Ishihara2009UltrasonicWalls} i odkryli że odległość od przeszkody ma 
+        wpływ na dopuszczalny kąt pomiaru. Wraz ze skracaniem dystansu można pozwolić sobie na coraz większy kąt i zachowanie niezawodności czujnika. Alternatywą dla czujników ultradźwiękowych mogą być moduły oparte o 
+        lasery podczerwone. Ponieważ wiązka lasera porusza się z prędkością światła, znacznie szybciej niż prędkość fali dźwiękowej, pomiary laserem są o wiele szybsze od tych wykonywanych przez czujnik ultradźwiękowy. 
+        Używanie wielu czujników laserowych nie wiąże się też z ryzykiem zaburzania odczytów przez siebie nawzajem, co w praktyce eliminuje potrzebę ustawiania opóźnień między pomiarami. Z drugiej strony użycie lasera sprawia że 
+        obiekty szklane lub odbijające światło nie zostaną poprawnie wykryte. Czujniki wykorzystujące laser podczerwony są też zazwyczaj droższe niż czujniki ultradźwiękowe. Zastosowanie czujników HC-SR04 motywowane było głównie ich niską 
+        ceną oraz dostępnością, jednak wymienione wcześniej zalety czujników laserowych czynią z nich wartą przemyślenia alternatywę.
 
 \chapter{Potencjalne ścieżki rozwoju projektu}
     \section{po jednym podrozdziale na każdy pomysł}
