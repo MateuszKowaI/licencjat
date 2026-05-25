@@ -144,10 +144,10 @@ Komputerem asystującym w przypadku tego projektu jest Raspberry Pi 5B.
         \subsection{Opcjonalne zastosowania autopilota}
         W zależności od modelu komputera pokładowego oraz zainstalowanego na nim oprogramowania może on dodatkowo obsługiwać wiele urządzeń peryferyjnych i posługiwać się bardziej złożoną logiką.
         Przeciętny komputer pokładowy dostępny na rynku cywilnym oferuje możliwość podłączenia zewnętrznego modułu GPS czy kamery, a także samodzielnie przechowywać i wykonywać polecenia 
-        pozwalające na lot autonomiczny. Standardem jest również możliwość ustawienia procedury bezpieczeństwa \textit{(ang. failsafe)} która decyduje jak zachowa się pojazd w razie utraty podłączenia
+        pozwalające na lot autonomiczny. Standardem jest również możliwość ustawienia procedury bezpieczeństwa \textit{(ang. failsafe)}, która decyduje jak zachowa się pojazd w razie utraty podłączenia
         z kontrolerem naziemnym lub jakimkolwiek innym urządzeniem wydającym polecenia komputerowi pokładowemu.
     \section{Rozszerzenie możliwości BSP dzięki komputerom asystującym}
-    Jeśli użytkownik chce wykorzystać swój BSP w bardziej nietypowy sposób, mogą stanąć mu na drodze ograniczenia sprzętowe. Komputery pokładowe oferują zazwyczaj niewielką moc obliczeniową
+    Jeśli użytkownik chce wykorzystać swój BSP w bardziej nietypowy sposób, na drodze mogą stanąć mu ograniczenia sprzętowe. Komputery pokładowe oferują zazwyczaj niewielką moc obliczeniową
     i ograniczoną ilość i różnorodność gniazd do podłączenia urządzeń peryferyjnych. Jednym ze sposobów przystosowania BSP do naszych wymagań jest użycie komputera asystującego który 
     rozszerzy możliwości jednostki. Przykładowo, użytkownik może chcieć użyć swojego BSP do monitorowania dużego obszaru. W tym celu chciałby zamontować kamery z wielu stron, jednak 
     użyty przez niego komputer pokładowy ma możliwość podpięcia tylko jednej kamery. Użycie komputera asystującego może być wtedy rozwiązaniem problemu. W zależności od użytego komputera 
@@ -168,7 +168,7 @@ Komputerem asystującym w przypadku tego projektu jest Raspberry Pi 5B.
         \begin{center}
             \includegraphics[width=10cm]{X500MotorSpec_1024x1024.jpg}
         \end{center}
-        \caption{Dokumentacja techniczna AIR2216II, BLHeli S 20A, T1045II. Źródło: ~\cite{web:holybro:naped:dok}}\label{rys:dok:naped}
+        \caption{Dokumentacja techniczna AIR2216II, BLHeli S 20A, T1045II. Źródło:~\cite{web:holybro:naped:dok}}\label{rys:dok:naped}
         \end{figure}
         \subsection{Zewnętrzny moduł GNSS}
         Zastosowany w jednostce zewnętrzny moduł GNSS to M10 od firmy Holybro. Oferuje jednoczesne otrzymywanie informacji od czterech największych 
@@ -196,7 +196,7 @@ Komputerem asystującym w przypadku tego projektu jest Raspberry Pi 5B.
         peryferyjnych, np. cztery gniazda USB czy 40 pinów GPIO. Zainstalowany na nim system operacyjny to Raspberry Pi OS będący portem Debiana Trixie.
         \subsection{Źródło zasilania}
         BSP zasilany jest za pomocą akumulatora litowo-jonowego Gens Ace G-Tech o pojemności 5000 mAh, napięciu 14.8V i wadze 439g. Za zasilanie komputera asystującego odpowiedzialny jest powerbank z baterią litowo-polimerową
-         o pojemności 10000 mAh, napięciu 5V i mocy maksymalnej 22,5W, wadze 235g. Możliwe jest zasilenie Raspberry Pi akumulatorem drona, wiąże się to jednak z ingerencją w gotowy układ zasilania oraz obniżenia napięcia z 14.8V do 5V. Problem 
+         o pojemności 10000 mAh, napięciu 5V i mocy maksymalnej 22,5W, wadze 235g. Możliwe jest zasilenie Raspberry Pi akumulatorem drona, wiąże się to jednak z ingerencją w gotowy układ zasilania oraz  koniecznością obniżenia napięcia z 14.8V do 5V. Problem 
          stanowią również silniki elektryczne napędzające jednostkę, ich zużycie prądu zmienia się bardzo dynamicznie co stwarza ryzyko spadku napięcia zasilającego komputer asystujący poniżej wymaganych 5V. W przypadku Raspberry Pi 
         spadek napięcia poniżej 4,63V (±5\%) może skutkować obniżoną wydajnością komputera, nieprawidłowym działaniem podłączonych urządzeń peryferyjnych lub do nieprzewidywalnego zachowania urządzenia czy uszkodzenia danych na karcie pamięci.~\cite{web:raspberry:pi:documentation:power:supply} 
         Z uwagi na potencjalne problemy i konieczność ingerencji w gotowy układ zasilania zastosowane zostało oddzielne źródło prądu dla komputera asystującego.
@@ -227,13 +227,14 @@ Komputerem asystującym w przypadku tego projektu jest Raspberry Pi 5B.
         Jeden silnik potrzebuje około 3,42A, co dla czterech silników daje łącznie 13,67A. Używając akumulatora o pojemności 5000 mAh daje to teoretyczne 21,95 minut lotu. Biorąc pod uwagę dodatkowe zużycie prądu przez komputer pokładowy oraz 
         zwiększone zużycie prądu przy wznoszeniu i manewrowaniu bezpieczniejszym będzie przyjęcie marginesu błędu i określenie czasu lotu na około 19-20 minut. Oszacowanie maksymalnego czasu działania Raspberry Pi jest dużo trudniejsze, 
         zależy to w dużym stopniu od złożoności programów na niej uruchomionych. Artykuł ogłaszający wypuszczenie na rynek Raspberry Pi 5 w wersji z 16GB pamięci RAM określa zużycie w spoczynku na 2-3W~\cite{web:raspberry:pi5:release:announcement}, 
-        zakładając zużycie 3W przy 10000 mAh i 5V daje to około 16,7 godzin działania. Trzeba jednak wziąć pod uwagę że to ogłoszenie nie jest tak wiarygodnym źródłem jak oficjalna dokumentacja, która w tym przypadku nie wspomina o poborze mocy 
-        w stanie spoczynku. Pobór prądu w praktyce będzie też większy ze względu na uruchomione na mikrokomputerze programy. Bez pomiaru poboru prądu podczas działania konkretnych programów nie da się niezawodnie oszacować czasu działania na jednym ładowaniu.
+        zakładając zużycie 3W przy 10000mAh i 5V daje to około 16,7 godzin działania. Trzeba jednak wziąć pod uwagę że to ogłoszenie nie jest tak wiarygodnym źródłem jak oficjalna dokumentacja, która w tym przypadku nie wspomina o poborze mocy 
+        w stanie spoczynku. Pobór prądu w praktyce będzie też większy ze względu na uruchomione na mikrokomputerze programy. Opisane dalej testy wykazały że pobór mocy w stanie spoczynku wahają się między 3.177W a 3.484W, większość odczytów była zbliżona do 3,281W. 
+        Przy parametrach zastosowanego zasilania szacowany czas działania to 11 godzin i 15 minut.
 \chapter{Zastosowanie środowiska}
     \section{Wstępne założenia}
         Komputer Raspberry Pi jest połączony z Pixhawk 6C za pomocą USB. W katalogu uavproject znajduje się wirtualne środowisko python oraz wszystkie programy współpracujące z dronem. Komunikacja z dronem możliwa jest dzięki bibliotekom DroneKit 2.9.2 i PyMAVLink 2.4.49. 
-        Użycie tych bibliotek ogranicza wersję pythona do nie nowszej niż 3.9.18 ponieważ od jakiegoś czasu są one nieutrzymywane. Za pomocą komendy \texttt{source uavproject/bin/activate}
-        uruchamiane jest wirtualne środowisko. Wewnątrz środowiska można testować napisane programy i instalować wymagane biblioteki. Pisanie programu najlepiej zacząć używając szablonu ~\ref{lst:szablon}.
+        Użycie tych bibliotek ogranicza wersję pythona do nie nowszej niż 3.9.18, ponieważ od jakiegoś czasu są one nieutrzymywane. Za pomocą komendy \texttt{source uavproject/bin/activate}
+        uruchamiane jest wirtualne środowisko. Wewnątrz środowiska można testować napisane programy i instalować wymagane biblioteki. Pisanie programu najlepiej zacząć używając szablonu~\ref{lst:szablon}.
         \begin{lstlisting}[language=python, caption={Szablon programu działającego na komputerze asystującym}, label={lst:szablon}]
 from dronekit import connect
 from pymavlink import mavutil
@@ -302,9 +303,9 @@ if __name__ == "__main__":
         
         Najważniejszym jego elementem jest funkcja \texttt{connect\_pixhawk()} otwierająca połączenie z komputerem pokładowym. Pierwszym etapem jest użycie biblioteki PyMAVLink do nasłuchiwania sygnału \textit{heartbeat}. Sygnał ten jest wysyłany przez komputer pokładowy w momencie gdy ten jest 
         uruchomiony i gotowy do pracy. Po otrzymaniu sygnału tworzone jest drugie połączenie z użyciem biblioteki DroneKit, które jest zwracane i może być użyte do komunikacji z dronem w dalszej części programu. Program, używając otwartego połączenia, wywołuje wysłanie wiadomości przez komputer Pixhawk 
-        o pomyślnym podłączeniu komputera asystującego. Wiadomość może być odczytana przez pilota mającego połączenie z jednostką dzięki aplikacji Mission Planner. Szablon uwzględnia również poprawne zamknięcie połączenia, niezależnie od sposobu zakończenia działania programu. W przypadku zatrzymania programu 
-        używając skrótu klawiszowego połączenie nie jest poprawnie zamykane, przez co uruchamianie programów więcej niż raz jest niemożliwe. Bez zamknięcia połączenia każda kolejna próba zakończy się błędem, ponieważ urządzenie bez poprawnie zamkniętego połączenia będzie oznaczone jako zajęte i niedostępne.\par 
-        Loty dronem najczęściej nie odbywają się w warunkach domowych, dlatego programy powinny się wykonywać automatycznie, bez potrzeby użycia klawiatury i monitora. W tym celu wykorzystany został skrypt ~\ref{lst:autorunuav} zapisany w \texttt{/etc/systemd/system/autorunuav.service}. Po uruchomieniu Raspberry Pi 
+        o pomyślnym podłączeniu komputera asystującego. Wiadomość może być odczytana przez pilota mającego połączenie z jednostką dzięki aplikacji Mission Planner. Szablon uwzględnia również poprawne zamknięcie połączenia, również w przypadku jeśli działanie programu zakończy się poprzez przerwanie skrótem klawiszowym lub błąd programu. 
+        Bez zamknięcia połączenia każda kolejna próba uruchomienia programu zakończy się błędem, ponieważ urządzenie bez poprawnie zamkniętego połączenia będzie oznaczone jako zajęte i niedostępne.\par 
+        Loty dronem najczęściej nie odbywają się w warunkach domowych, dlatego programy powinny się wykonywać automatycznie, bez potrzeby użycia klawiatury i monitora. W tym celu wykorzystany został skrypt~\ref{lst:autorunuav} zapisany w \texttt{/etc/systemd/system/autorunuav.service}. Po uruchomieniu Raspberry Pi 
         skrypt poczeka aż system będzie w pełni uruchomiony, po czym wykona program określony w parametrze \texttt{ExecStart} przy użyciu wirtualnego środowiska. W przypadku jeśli program przestanie działać skrypt odczeka pięć sekund i uruchomi go ponownie. Po każdej zmianie automatycznie uruchamianego programu lub 
         jakichkolwiek innych zmian w skrypcie należy odświeżyć systemd komendą \texttt{sudo systemctl daemon-reload} oraz uruchomić skrypt za pomocą \texttt{sudo systemctl start autorunuav.service}. Wyjście programu można zobaczyć używając komendy \texttt{journalctl -u autorunuav.service -f}.
 
@@ -338,7 +339,7 @@ WantedBy=multi-user.target
         do Raspberry Pi ze względu na różnicę w napięciach. W czujnikach HC-SR04 dla sygnału wychodzącego przez pin ECHO stan wysoki to 5V. Takie napięcie jest odpowiednie dla mikrokomputera Arduino, 
         jednak stan wysoki dla pinów w Raspberry Pi to 3,3V. Aby zapobiec uszkodzeniom należy obniżyć napięcie wychodzące z czujnika do bezpiecznych 3,3V, co zostało osiągnięte z użyciem 
         konwertera poziomów logicznych. Zaprojektowane i wydrukowane na drukarce 3D uchwyty pozwalają na zamontowanie czujników i konwertera na dronie oraz regulację ich pozycji w poziomie.
-        Program ~\ref{lst:colPrevention} wywołuje wysłanie ostrzeżenia do pilota w przypadku jeśli wykryta zostanie przeszkoda oraz dron zbliża się do niej z odpowiednią prędkością. 
+        Program~\ref{lst:colPrevention} wywołuje wysłanie ostrzeżenia do pilota w przypadku jeśli wykryta zostanie przeszkoda oraz dron zbliża się do niej z odpowiednią prędkością. 
         Zmienne globalne na początku programu określają między innymi minimalną odległość i prędkość przy których program powinien wywołać ostrzeżenie, wymaga również określenia kątów pod jakimi 
         ustawione są czujniki. Wartość 0 oznacza czujnik zwrócony na wprost, wartości ujemne oznaczają odchylenie w lewo a wartości dodatnie oznaczają odchylenie w prawo. Dla wygody użytkownika 
         kąty wyrażone są w stopniach. Po ustanowieniu połączenia z komputerem pokładowym program w nieskończonej pętli odczytuje odległości z czujników, zostawiając przerwę między odczytami równą 
@@ -482,6 +483,21 @@ if __name__ == "__main__":
     main()
         \end{lstlisting}
 
+    \section{Testy}
+        \subsection{Sprawdzenie poprawności działania systemu}
+        W celu weryfikacji działania zbudowanego systemu wykonano szereg testów w trakcie rozwoju, które potem powtórzono po ukończeniu prac.
+        Czujniki odległości zostały przetestowane poprzez ustawienie płaskiej przeszkody prostopadle do czujnika, w odległościach 30cm, 50cm, 1m, 2m i 4m. 
+        We wszystkich przypadkach wykonane pomiary nie odbiegały od rzeczywistej odległości powyżej 1cm różnicy, co jest wystarczającą dokładnością dla 
+        wykrywania przeszkód. W celu sprawdzenia działania programu biorącego pod uwagę prędkość zbliżania się do przeszkody wykonano imitację przeszkody 
+        montowaną na BSP kilka centymetrów przed jednym z czujników odległości. Dron następnie był wznoszony w powietrze i rozpędzany do prędkości przekraczającej 
+        minimalną wymaganą do wysłania ostrzeżenia. Próbę powtórzono dla wszystkich trzech czujników.\par
+        Połączenie między komputerem pokładowym i asystującym jest weryfikowane poprzez wysłanie komunikatu o pomyślnym otwarciu połączenia. Komunikat ten może 
+        być odczytany przy użyciu komputera z aplikacją Mission Planner.
+        \subsection{Pobór prądu}
+        Pobór prądu Raspberry Pi w trakcie działania programu został zmierzony z użyciem miernika KWS-2302C. Pomiary wahały się pomiędzy 3,371W a 3,612W, w większości 
+        oscylując około 3,491W. Biorąc pod uwagę parametry powerbanka zasilającego komputer asystujący można oszacować czas pracy na jednym ładowaniu na około 10,5 godziny.
+        \subsection{Dokładność pomiarów odległości}
+        \subsection{Czas reakcji systemu}
     \section{Alternatywne warianty projektu}
         W trakcie pracy nad systemem zapobiegającym kolizjom powstały alternatywne rozwiązania i pomysły które nie trafiły do końcowej wersji. 
         Przykładowo program biorący pod uwagę prędkość drona przy decydowaniu o wysłaniu ostrzeżenia został napisany na podstawie wersji sprawdzającej 
@@ -507,7 +523,10 @@ if __name__ == "__main__":
         ceną oraz dostępnością, jednak wymienione wcześniej zalety czujników laserowych czynią z nich wartą przemyślenia alternatywę.
 
 \chapter{Potencjalne ścieżki rozwoju projektu}
-    \section{po jednym podrozdziale na każdy pomysł}
+    \section{Półautonomiczny system zapobiegania kolizjom}
+    \section{Wielokierunkowy monitoring}
+    \section{Sieć neuronowa rozpoznawanie obiektów z obrazu kamery}
+    \section{mapa 3d lidar}
 \addcontentsline{toc}{chapter}{Bibliografia} % też ręczne dodanie do spisu treści, jak Wstęp
 \label{sec:bibliografia}
 \bibliography{MKowalBibliografia}
