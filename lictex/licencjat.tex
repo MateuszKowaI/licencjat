@@ -10,6 +10,7 @@
 \usepackage{amsmath} % to do dodatkowych symboli, przydatne
 \usepackage{amssymb} % to też do dodatkowych symboli, też przydatne
 \usepackage{amsthm}
+\usepackage{xcolor}
 \usepackage[pdftex,
             left=1.1in,right=1.1in,
             top=1.1in,bottom=1.1in]{geometry} % marginesy
@@ -32,7 +33,25 @@
     keepspaces,
     captionpos=t,    
     commentstyle=\color{red},
-    keywordstyle=\color{blue}
+    keywordstyle=\color{blue},
+    literate={ą}{{\k{a}}}1
+             {ć}{{\'c}}1
+             {ę}{{\k{e}}}1
+             {ł}{{\l{}}}1
+             {ń}{{\'n}}1
+             {ó}{{\'o}}1
+             {ś}{{\'s}}1
+             {ź}{{\'z}}1
+             {ż}{{\.z}}1
+             {Ą}{{\k{A}}}1
+             {Ć}{{\'C}}1
+             {Ę}{{\k{E}}}1
+             {Ł}{{\L{}}}1
+             {Ń}{{\'N}}1
+             {Ó}{{\'O}}1
+             {Ś}{{\'S}}1
+             {Ź}{{\'Z}}1
+             {Ż}{{\.Z}}1
 }
 \newfloat{lstfloat}{htbp}{lolst}[chapter]
 \floatname{lstfloat}{Listing}
@@ -95,7 +114,7 @@
 &  {\sf napisana w Katedrze Oprogramowania Systemów Informatycznych} \\
 &  {\sf Instytutu Informatyki i Matematyki UMCS} \\
 & \vspace{-7mm} \\
-& {\sf pod kierunkiem \bfseries dr hab. profesor uczelni Beaty Byliny} \\
+& {\sf pod kierunkiem \bfseries dr hab. Beaty Byliny} \\
 \multicolumn{2}{@{\hspace{28mm}}l}{\vspace{15mm}} \\
 \multicolumn{2}{@{\hspace{28mm}}l}{\textbf{\textsf{Lublin 2026}}}
 \end{tabular}
@@ -124,7 +143,7 @@ Tu treść wstępu (który piszemy na końcu, po napisaniu całej pracy).
 
 \section{Podstawowe pojęcia}
 
-Bezzałogowy statek powietrzny, skrót BSP, to kategoria pojazdów poruszających się w powietrzu 
+Bezzałogowy statek powietrzny (skrót BSP) to kategoria pojazdów poruszających się w powietrzu 
 do której zaliczane są samoloty, śmigłowce i pojazdy wielowirnikowe (w tym drony), które 
 odbywają loty bez pilota na pokładzie i bez możliwości zabierania pasażerów. Sterowanie może 
 się odbywać zdalnie przez pilota naziemnego lub przez komputer, jeśli pojazd jest \mbox{autonomiczny\cite{web:easa:uavdef}}.
@@ -162,12 +181,15 @@ Komputerem asystującym w przypadku tego projektu jest Raspberry Pi 5B.
     \chapter{Szczegóły techniczne zbudowanego środowiska}
     % zdjęcie gotowego drona po zrobieniu obudowy
     \section{Lista komponentów i ich specyfikacja}
+    Większość gotowych bezzałogowych pojazdów dostępnych na rynku to zamknięte systemy a ingerencje i modyfikacje są bardzo utrudnione, zarówno sprzętowo jak i w oprogramowaniu. 
+    Samodzielna budowa jednostki z użyciem kupionych oddzielnie komponentów oraz oprogramowania open-source daje dużo większe możliwości w przystosowaniu platformy do 
+    własnych wymagań i preferencji.
         \subsection{Rama BSP}
         Rama użyta do zbudowania jednostki to Holybro S500 v2. Oferuje wbudowaną w konstrukcję kadłuba rozdzielnicę napięcia \textit{(ang. power distribution board)} dostarczającą energię elektryczną
         z akumulatora do silników. Miejscem na montaż silników są cztery ramiona wykonane z nylonu poliamidowego, wzmocnione w środku poprzez dodanie prętów z włókna węglowego. Całość 
         opiera się na podwoziu z rurek z włókna węglowego połączonych plastikowymi łącznikami.
         \subsection{Napęd}
-        Pojazd napędzany jest przez cztery silniki bezszczotkowe AIR2216II osiągające do 272W. Silniki bezszczotkowe wymagają zasilania prądem zmiennym trójfazowym, dlatego do ich działania 
+        Pojazd napędzany jest przez cztery silniki bezszczotkowe AIR2216II osiągające do 272~W. Silniki bezszczotkowe wymagają zasilania prądem zmiennym trójfazowym, dlatego do ich działania 
         potrzebne są moduły elektronicznej kontroli prędkości \textit{(ang. electronic speed controller)}. Moduły te otrzymują zasilanie prądem stałym z akumulatora oraz sygnał z komputera pokładowego 
         sterujący prędkością obracania się silników. Następnie generuje prąd zmienny trójfazowy który wywołuje obrót silników. Moduły ESC zastosowane w zbudowanym pojeździe to BLHeli S 20A. 
         Jednostka została wyposażona w śmigła T1045II o rozpiętości 260 milimetrów i szerokości do 30 milimetrów. Specyfikacja każdego z elementów napędu została pokazana na rysunku ~\ref{rys:dok:naped}.
@@ -180,11 +202,11 @@ Komputerem asystującym w przypadku tego projektu jest Raspberry Pi 5B.
         \subsection{Zewnętrzny moduł GNSS}
         Zastosowany w jednostce zewnętrzny moduł GNSS to M10 od firmy Holybro. Oferuje jednoczesne otrzymywanie informacji od czterech największych 
         systemów satelit geolokacyjnych: europejskich satelit Galileo, amerykańskich GPS, rosyjskich GLONASS i chińskich Bei Dou. Oferowana dokładność wyznaczonej pozycji to 
-        2.0m CEP, co oznacza że co najmniej 50\% pomiarów wskaże pozycję oddaloną o 2 metry lub mniej od rzeczywistej \mbox{pozycji\cite{web:holybro:m10gps}}.
+        2.0~m CEP, co oznacza że co najmniej 50\% pomiarów wskaże pozycję oddaloną o 2 metry lub mniej od rzeczywistej \mbox{pozycji\cite{web:holybro:m10gps}}.
         \subsection{Układ komunikacji z pilotem}
         BSP został przygotowany do utrzymywania dwóch rodzajów komunikacji z pilotem. Podstawowym kanałem komunikacji jest kontroler RadioMaster TX12 MKII pozwalający na zdalne 
         sterowanie dronem wyposażonym w odbiornik radiowy RadioMaster RP4TD-M używając systemu ExpressLRS zapewniającego niezawodność i stabilność łącza nawet na dużych dystansach. 
-        Drugim kanałem komunikacji jest system telemetrii Holybro SiK Telemetry Radio V3 w wersji 433MHz. Moduł podłączony do komputera osobistego znajdującego się na ziemi w pobliżu 
+        Drugim kanałem komunikacji jest system telemetrii Holybro SiK Telemetry Radio V3 w wersji 433~MHz. Moduł podłączony do komputera osobistego znajdującego się na ziemi w pobliżu 
         pilota pozwala na użycie aplikacji Mission Planner--- oprogramowania pozwalającego między innymi na śledzenie BSP na mapie czy odczyt bieżących \mbox{danych\cite{web:ardupilot:mission:planner}}.
         \subsection{Komputer pokładowy}
         Rolę komputera pokładowego pełni Pixhawk 6C. Wyposażony jest w dwa procesory: STM32H743 — 480MHz Cortex-M7 odpowiedzialny za działanie oprogramowania zainstalowanego na urządzeniu, 
@@ -199,44 +221,43 @@ Komputerem asystującym w przypadku tego projektu jest Raspberry Pi 5B.
         magnetometr IST8310 pozwalający na określenie jego pozycji na podstawie pola magnetycznego Ziemi oraz barometr MS5611 pozwalający obliczyć wysokość nad ziemią na podstawie różnicy \mbox{ciśnień\cite{web:pixhawk6c:specs}}.
         Oprogramowaniem działającym na komputerze pokładowym jest ArduCopter w wersji 4.6.2.
         \subsection{Komputer asystujący}
-        Asystentem dla Pixhawk 6C jest mikrokomputer Raspberry Pi 5B. Posiada on czterordzeniowy procesor Arm Cortex-A76, 8GB pamięci RAM oraz szereg sposobów na podłączenie urządzeń 
+        Asystentem dla Pixhawk 6C jest mikrokomputer Raspberry Pi 5B. Posiada on czterordzeniowy procesor Arm Cortex-A76, 8~GB pamięci RAM oraz szereg sposobów na podłączenie urządzeń 
         peryferyjnych, np. cztery gniazda USB czy 40 pinów GPIO. Zainstalowany na nim system operacyjny to Raspberry Pi OS będący portem Debiana Trixie.
         \subsection{Źródło zasilania}
-        BSP zasilany jest za pomocą akumulatora litowo-jonowego Gens Ace G-Tech o pojemności 5000 mAh, napięciu 14.8V i wadze 439g. Za zasilanie komputera asystującego odpowiedzialny jest powerbank z baterią litowo-polimerową
-         o pojemności 10000 mAh, napięciu 5V i mocy maksymalnej 22,5W, wadze 235g. Możliwe jest zasilenie Raspberry Pi akumulatorem drona, wiąże się to jednak z ingerencją w gotowy układ zasilania oraz  koniecznością obniżenia napięcia z 14.8V do 5V. Problem 
-         stanowią również silniki elektryczne napędzające jednostkę, ich zużycie prądu zmienia się bardzo dynamicznie co stwarza ryzyko spadku napięcia zasilającego komputer asystujący poniżej wymaganych 5V. W przypadku Raspberry Pi 
-        spadek napięcia poniżej 4,63V (±5\%) może skutkować obniżoną wydajnością komputera, nieprawidłowym działaniem podłączonych urządzeń peryferyjnych lub do nieprzewidywalnego zachowania urządzenia czy uszkodzenia danych na karcie pamięci.~\cite{web:raspberry:pi:documentation:power:supply} 
+        BSP zasilany jest za pomocą akumulatora litowo-jonowego Gens Ace G-Tech o pojemności 5000~mAh, napięciu 14.8~V i wadze 439~g. Za zasilanie komputera asystującego odpowiedzialny jest powerbank z baterią litowo-polimerową
+         o pojemności 10000~mAh, napięciu 5~V, mocy maksymalnej 22.5~W i wadze 235~g. Możliwe jest zasilenie Raspberry Pi akumulatorem drona, wiąże się to jednak z ingerencją w gotowy układ zasilania oraz  koniecznością obniżenia napięcia z 14.8~V do 5~V. Problem 
+         stanowią również silniki elektryczne napędzające jednostkę, ich zużycie prądu zmienia się bardzo dynamicznie co stwarza ryzyko spadku napięcia zasilającego komputer asystujący poniżej wymaganych 5~V. W przypadku Raspberry Pi 
+        spadek napięcia poniżej 4.6~3V (±5\%) może skutkować obniżoną wydajnością komputera, nieprawidłowym działaniem podłączonych urządzeń peryferyjnych lub do nieprzewidywalnego zachowania urządzenia czy uszkodzenia danych na karcie pamięci.~\cite{web:raspberry:pi:documentation:power:supply} 
         Z uwagi na potencjalne problemy i konieczność ingerencji w gotowy układ zasilania zastosowane zostało oddzielne źródło prądu dla komputera asystującego.
 
     \section{Specyfikacja drona}
-        Waga jednostki, wliczając w to komputer asystujący i jego źródło zasilania, wynosi 1715g. Na podstawie wagi, specyfikacji \mbox{silników\cite{web:holybro:naped:dok}} oraz akumulatora można oszacować średni możliwy czas lotu. 
-        Aby dron zawisł w bezruchu, każdy z czterech silników musi wytworzyć ok. 428,75g ciągu. Dzięki dokumentacji wiadomo że jeden silnik z zastosowanym dołączonym w zestawie śmigłem potrzebuje 2,86A do wytworzenia 373g ciągu i 
-        3,60A dla 447g ciągu. Prąd potrzebny do wytworzenia dokładnie 428,75g ciągu może być obliczony z użyciem interpolacji liniowej:
+        Waga jednostki, wliczając w to komputer asystujący i jego źródło zasilania, wynosi 1715~g. Na podstawie wagi, specyfikacji \mbox{silników\cite{web:holybro:naped:dok}} oraz akumulatora można oszacować średni możliwy czas lotu. 
+        Aby dron zawisł w bezruchu, każdy z czterech silników musi wytworzyć ok. 428.75~g ciągu. Dzięki dokumentacji wiadomo że jeden silnik z zastosowanym dołączonym w zestawie śmigłem potrzebuje 2.86~A do wytworzenia 373~g ciągu i 
+        3.60~A dla 447~g ciągu. Prąd potrzebny do wytworzenia dokładnie 428.75~g ciągu może być obliczony z użyciem interpolacji liniowej:
         \[
-        I = I_1 + \frac{T - T_1}{T_2 - T_1}(I_2 - I_1)
+        I = I_1 + \frac{T - T_1}{T_2 - T_1}(I_2 - I_1),
         \]
 
         \[
-        I = 2.86 + \frac{428.75 - 373}{447 - 373}(3.60 - 2.86)
+        I = 2.86 + \frac{428.75 - 373}{447 - 373}(3.60 - 2.86),
         \]
 
         \[
-        I \approx 3.42\ \text{A}
+        I \approx 3.42\ \text{A}.
         \]
-        Jeden silnik potrzebuje około 3,42A, co dla czterech silników daje łącznie 13,67A. Używając akumulatora o pojemności 5000 mAh daje to teoretyczne 21,95 minut lotu. Biorąc pod uwagę dodatkowe zużycie prądu przez komputer pokładowy oraz 
+        Jeden silnik potrzebuje około 3.42~A, co dla czterech silników daje łącznie 13.67~A. Używając akumulatora o pojemności 5000~mAh daje to teoretyczne 21.95 minut lotu. Biorąc pod uwagę dodatkowe zużycie prądu przez komputer pokładowy oraz 
         zwiększone zużycie prądu przy wznoszeniu i manewrowaniu, bezpieczniejszym będzie przyjęcie marginesu błędu i określenie czasu lotu na około 19--20 minut. Oszacowanie maksymalnego czasu działania Raspberry Pi jest dużo trudniejsze, 
-        zależy to w dużym stopniu od złożoności programów na niej uruchomionych. Artykuł ogłaszający wypuszczenie na rynek Raspberry Pi 5 w wersji z 16GB pamięci RAM określa zużycie w spoczynku na \mbox{2--3W\cite{web:raspberry:pi5:release:announcement}}, 
-        zakładając zużycie 3W przy 10000mAh i 5V daje to około 16,7 godzin działania. Trzeba jednak wziąć pod uwagę że to ogłoszenie nie jest tak wiarygodnym źródłem jak oficjalna dokumentacja, która w tym przypadku nie wspomina o poborze mocy 
-        w stanie spoczynku. Pobór prądu w praktyce będzie też większy ze względu na uruchomione na mikrokomputerze programy. Opisane dalej testy wykazały że pobór mocy w stanie spoczynku wahają się między 3.177W a 3.484W, większość odczytów była zbliżona do 3,281W. 
+        zależy to w dużym stopniu od złożoności programów na niej uruchomionych. Artykuł ogłaszający wypuszczenie na rynek Raspberry Pi 5 w wersji z 16~GB pamięci RAM określa zużycie w spoczynku na \mbox{2--3W\cite{web:raspberry:pi5:release:announcement}}, 
+        zakładając zużycie 3~W przy 10000~mAh i 5~V daje to około 16.7 godzin działania. Trzeba jednak wziąć pod uwagę że to ogłoszenie nie jest tak wiarygodnym źródłem jak oficjalna dokumentacja, która w tym przypadku nie wspomina o poborze mocy 
+        w stanie spoczynku. Pobór prądu w praktyce będzie też większy ze względu na uruchomione na mikrokomputerze programy. Opisane dalej testy wykazały że pobór mocy w stanie spoczynku wahają się między 3.177~W a 3.484~W, większość odczytów była zbliżona do 3.281~W. 
         Przy parametrach zastosowanego zasilania szacowany czas działania to 11 godzin i 15 minut.
 \chapter{Zastosowanie środowiska}
     \section{Wstępne założenia}
-        Komputer Raspberry Pi jest połączony z Pixhawk 6C za pomocą USB. W katalogu \texttt{\string~/uavproject} znajduje się wirtualne środowisko python oraz wszystkie programy współpracujące z dronem. Komunikacja z dronem możliwa jest dzięki bibliotekom DroneKit 2.9.2 i PyMAVLink 2.4.49. 
-        Użycie tych bibliotek ogranicza wersję pythona do nie nowszej niż 3.9.18, ponieważ od jakiegoś czasu biblioteki są nieutrzymywane i nie współpracują z nowszymi wersjami pythona. Za pomocą komendy \texttt{source uavproject/venv/bin/activate}
+        Komputer Raspberry Pi jest połączony z Pixhawk 6C za pomocą USB. W katalogu \texttt{\string~/uavproject} znajduje się wirtualne środowisko python oraz wszystkie programy współpracujące z dronem. Komunikacja z dronem możliwa jest dzięki bibliotece DroneKit 2.9.2. 
+        Użycie tej biblioteki ogranicza wersję pythona do nie nowszej niż 3.9.18, ponieważ od jakiegoś czasu biblioteka są nieutrzymywane i nie współpracuje z nowszymi wersjami pythona. Za pomocą komendy \texttt{source uavproject/venv/bin/activate}
         uruchamiane jest wirtualne środowisko. Wewnątrz środowiska można testować napisane programy i instalować wymagane biblioteki. Pisanie programu najlepiej zacząć używając szablonu~\ref{lst:szablon}.
         \begin{lstlisting}[language=python, caption={Szablon programu działającego na komputerze asystującym}, label={lst:szablon}]
-from dronekit import connect
-from pymavlink import mavutil
+from dronekit import connect, APIException
 import os
 import time
 
@@ -244,29 +265,25 @@ DRONE_PORT = """/dev/serial/by-id/usb-Holybro_Pixhawk6C_
                 450046001751333337363133-if00"""
 
 def connect_pixhawk():
-    print("Waiting for Pixhawk heartbeat...")
+    print("Connecting to Pixhawk...")
 
     while True:
         try:
-            master = mavutil.mavlink_connection(
-                DRONE_PORT,
-                baud=115200
-            )
-
-            master.wait_heartbeat(timeout=60)
-            print("Pixhawk heartbeat received")
-
             vehicle = connect(
                 DRONE_PORT,
                 baud=115200,
-                wait_ready=False
+                wait_ready=True,
+                heartbeat_timeout=60
             )
-
             print("Connected to Pixhawk")
             return vehicle
 
+        except APIException as e:
+            print(f"No heartbeat yet: {e}")
+            time.sleep(3)
+
         except Exception as e:
-            print(f"Pixhawk not ready: {e}")
+            print(f"Connection failed: {e}")
             time.sleep(3)
 def main():
     vehicle = None
@@ -299,9 +316,9 @@ if __name__ == "__main__":
         \end{lstlisting}
 
         
-        Najważniejszym jego elementem jest funkcja \texttt{connect\_pixhawk()} otwierająca połączenie z komputerem pokładowym. Pierwszym etapem jest użycie biblioteki PyMAVLink do nasłuchiwania sygnału \textit{heartbeat}. Sygnał ten jest wysyłany przez komputer pokładowy w momencie gdy ten jest 
-        uruchomiony i gotowy do pracy. Po otrzymaniu sygnału tworzone jest drugie połączenie z użyciem biblioteki DroneKit, które jest zwracane i może być użyte do komunikacji z dronem w dalszej części programu. Program, używając otwartego połączenia, wywołuje wysłanie wiadomości przez komputer Pixhawk 
-        o pomyślnym podłączeniu komputera asystującego. Wiadomość może być odczytana przez pilota mającego połączenie z jednostką dzięki aplikacji Mission Planner. Szablon uwzględnia również poprawne zamknięcie połączenia, również w przypadku jeśli działanie programu zakończy się poprzez przerwanie skrótem klawiszowym lub błąd programu. 
+        Szablon obejmuje poprawne otwarcie połączenia z komputerem pokładowym za pomocą funkcji \texttt{connect\_pixhawk()}.  Funkcja tworzy połączenie i nasłuchuje sygnału \textit{heartbeat}. Sygnał ten jest wysyłany przez komputer pokładowy w momencie gdy ten jest 
+        uruchomiony i gotowy do pracy. Po otrzymaniu sygnału połączenie jest zwracane i może być użyte do komunikacji z dronem w dalszej części programu. Program, używając otwartego połączenia, wywołuje wysłanie wiadomości przez komputer Pixhawk 
+        o pomyślnym podłączeniu komputera asystującego. Wiadomość może być odczytana przez pilota mającego połączenie z jednostką dzięki aplikacji Mission Planner. Szablon uwzględnia też poprawne zamknięcie połączenia, również w przypadku jeśli działanie programu zakończy się poprzez przerwanie skrótem klawiszowym lub błąd programu. 
         Bez zamknięcia połączenia każda kolejna próba uruchomienia programu zakończy się błędem, ponieważ urządzenie bez poprawnie zamkniętego połączenia będzie oznaczone jako zajęte i niedostępne.\par 
         Loty dronem najczęściej nie odbywają się w warunkach domowych, dlatego programy powinny się wykonywać automatycznie, bez potrzeby użycia klawiatury i monitora. W tym celu wykorzystany został skrypt~\ref{lst:autorunuav} zapisany w \texttt{/etc/systemd/system/autorunuav.service}. Po uruchomieniu Raspberry Pi 
         skrypt poczeka aż system będzie w pełni uruchomiony, po czym wykona program określony w parametrze \texttt{ExecStart} przy użyciu wirtualnego środowiska. W przypadku jeśli program przestanie działać skrypt odczeka pięć sekund i uruchomi go ponownie. Po każdej zmianie automatycznie uruchamianego programu lub 
@@ -330,12 +347,12 @@ StandardError=journal
 WantedBy=multi-user.target
         \end{lstlisting}
 
-    \section{Przykład użycia}
+    \section{Ostrzeżenie przed zbliżającą się przeszkodą}
         W celu przetestowania zbudowanej platformy i zaprezentowania jednej z możliwości jej wykorzystania zbudowano system ostrzegania przed kolizją. 
-        Wykrywanie przeszkód odbywa się z użyciem trzech ultradźwiękowych czujników odległości \mbox{HC-SR04\cite{web:HC-SR04:manual}}. Zasilanie 5V oraz uziemienie są 
-        połączone równolegle do pinów w Raspberry Pi. Piny TRIG w czujnikach, wywołujące pomiar, są podłączone bezpośrednio do pinów GPIO. Wyjście ECHO czujników nie może być podłączone 
-        do Raspberry Pi ze względu na różnicę w napięciach. W czujnikach HC-SR04 dla sygnału wychodzącego przez pin ECHO stan wysoki to 5V. Takie napięcie jest odpowiednie dla mikrokomputera Arduino, 
-        jednak stan wysoki dla pinów w Raspberry Pi to 3,3V. Aby zapobiec uszkodzeniom należy obniżyć napięcie wychodzące z czujnika do bezpiecznych 3,3V, co zostało osiągnięte z użyciem 
+        Wykrywanie przeszkód odbywa się z użyciem trzech ultradźwiękowych czujników odległości \mbox{HC-SR04\cite{web:HC-SR04:manual}}. Zasilanie 5~V oraz uziemienie są 
+        połączone równolegle do pinów w Raspberry Pi. Piny \texttt{TRIG} w czujnikach, wywołujące pomiar, są podłączone bezpośrednio do pinów GPIO. Wyjście \texttt{ECHO} czujników nie może być podłączone 
+        do Raspberry Pi ze względu na różnicę w napięciach. W czujnikach HC-SR04 dla sygnału wychodzącego przez pin \texttt{ECHO} stan wysoki to 5~V. Takie napięcie jest odpowiednie dla mikrokomputera Arduino, 
+        jednak stan wysoki dla pinów w Raspberry Pi to 3.3~V. Aby zapobiec uszkodzeniom należy obniżyć napięcie wychodzące z czujnika do bezpiecznych 3.3~V, co zostało osiągnięte z użyciem 
         konwertera poziomów logicznych. Zaprojektowane i wydrukowane na drukarce 3D uchwyty pozwalają na zamontowanie czujników i konwertera na dronie oraz regulację ich pozycji w poziomie.
         Program~\ref{lst:colPrevention} wywołuje wysłanie ostrzeżenia do pilota w przypadku jeśli wykryta zostanie przeszkoda oraz dron zbliża się do niej z odpowiednią prędkością. 
         Zmienne globalne na początku programu określają między innymi minimalną odległość i prędkość przy których program powinien wywołać ostrzeżenie, wymaga również określenia kątów pod jakimi 
@@ -345,7 +362,7 @@ WantedBy=multi-user.target
         zakończy pomiar. W takiej sytuacji może się zdarzyć że fala ultradźwiękowa wysłana przez poprzedni czujnik dotrze do kolejnego, co skutkować będzie zaburzonym pomiarem i fałszywie krótkim zmierzonym dystansem. 
         Ryzyko wystąpienia takiego problemu jest największe gdy czujniki zwrócone są w tę samą stronę, w przypadku zbudowanego systemu ostrzegania ryzyko zaburzenia pomiaru z tego powodu jest znikome. 
         Mimo wszystko pozostawienie odstępu jest wskazane, a odstęp 50ms nie jest wystarczająco długi aby uczynić program zawodnym przez zbyt rzadkie pomiary. Każda wartość pomiaru zwracana jest w postaci liczby 
-        zmiennoprzecinkowej pomiędzy 0 a 1, gdzie 0 oznacza 0cm a 1 oznacza maksymalną odległość pomiaru określaną w zmiennej \texttt{MAX\_DIST}. Wartość pomiaru jest mnożona przez 100 i maksymalną odległość pomiaru w celu 
+        zmiennoprzecinkowej pomiędzy 0 a 1, gdzie 0 oznacza 0~cm a 1 oznacza maksymalną odległość pomiaru określaną w zmiennej \texttt{MAX\_DIST}. Wartość pomiaru jest mnożona przez 100 i maksymalną odległość pomiaru w celu 
         uzyskania wartości w centymetrach. Komputer Pixhawk dostarcza programowi informacji o prędkości drona i jego odchyleniu od kierunku północnego. Prędkość drona jest wyrażona w postaci trzech wartości: prędkości w kierunku północnym, 
         wschodnim i w dół. Dzięki odchyleniu od kierunku północnego obliczana jest prędkość względem BSP. Program następnie oblicza prędkość względem danego czujnika, wykorzystując określony wcześniej kąt jego odchylenia względem przodu. 
         Mając te dane program porównuje odczytaną z czujników odległość z określonym progiem aktywacji oraz obecną prędkość w kierunku w który skierowany jest czujnik z minimalną prędkością aktywującą ostrzeżenie. 
@@ -355,8 +372,7 @@ WantedBy=multi-user.target
 \begin{lstlisting}[language=python, caption={Program ostrzegający przed kolizją}, label={lst:colPrevention}]
 import time
 import math
-from dronekit import connect
-from pymavlink import mavutil
+from dronekit import connect, APIException
 
 from gpiozero import Device, DistanceSensor
 from gpiozero.pins.lgpio import LGPIOFactory
@@ -382,25 +398,25 @@ sensor3 = DistanceSensor(echo=22, trigger=25, max_distance=MAX_DIST)
 
 
 def connect_pixhawk():
+    print("Connecting to Pixhawk...")
+
     while True:
         try:
-            conn = mavutil.mavlink_connection(
-                DRONE_PORT,
-                baud=115200
-            )
-
-            conn.wait_heartbeat(timeout=60)
-            conn.close()
-
             vehicle = connect(
                 DRONE_PORT,
                 baud=115200,
-                wait_ready=True
+                wait_ready=True,
+                heartbeat_timeout=60
             )
-
+            print("Connected to Pixhawk")
             return vehicle
 
-        except Exception:
+        except APIException as e:
+            print(f"No heartbeat yet: {e}")
+            time.sleep(3)
+
+        except Exception as e:
+            print(f"Connection failed: {e}")
             time.sleep(3)
 
 
@@ -481,21 +497,261 @@ if __name__ == "__main__":
     main()
         \end{lstlisting}
 
+    \section{Dynamiczne ustawianie odległości progu aktywacji}
+        Program wyżej miał ustawioną na stałe odległość, poniżej której wykryta przeszkoda wywoła wysłanie powiadomienia. Na jego podstawie powstała bardziej rozwinięta wersja. 
+        Zamiast jednego progu aktywacji definiowanego z góry, Program odczytuje prędkość drona i ustala próg dynamicznie, dla każdego czujnika oddzielnie. W tym celu wykorzystano 
+        pomiary czasu reakcji i ustalono średni czas na 1.6~s oraz maksymalną odległość mierzoną przez czujniki na 4.5~m. Na podstawie tych danych obliczana jest odległość, z jakiej 
+        pilot będzie w stanie zareagować na zbliżającą się przeszkodę. %TODO jakoś to ładniej napisać
+\begin{lstlisting}[language=python, caption={Program ostrzegający przed kolizjąaaaa}, label={lst:colPreventionaaa}]
+import time
+import math
+import csv
+from datetime import datetime
+
+from dronekit import connect, APIException
+from pymavlink import mavutil
+
+from gpiozero import Device, DistanceSensor
+from gpiozero.pins.lgpio import LGPIOFactory
+
+Device.pin_factory = LGPIOFactory()
+
+DRONE_PORT = "/dev/serial/by-id/usb-Holybro_Pixhawk6C_450046001751333337363133-if00"
+
+REACTION_TIME_S = 1.6
+GAP = 0.05                  # 50 ms
+MAX_DIST_M = 4.5            # w metrach
+MAX_DIST_CM = MAX_DIST_M * 100.0
+LOG_FILE = "sensor_threshold_log.csv"
+
+SENSOR_ANGLES_DEG = {
+    1: -45.0,
+    2: 0.0,
+    3: 45.0
+}
+
+sensor1 = DistanceSensor(echo=17, trigger=23, max_distance=MAX_DIST_M)
+sensor2 = DistanceSensor(echo=27, trigger=24, max_distance=MAX_DIST_M)
+sensor3 = DistanceSensor(echo=22, trigger=25, max_distance=MAX_DIST_M)
+
+
+def init_log_file():
+    try:
+        with open(LOG_FILE, "x", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow([
+                "timestamp",
+                "sensor_id",
+                "distance_cm",
+                "toward_speed_m_s",
+                "threshold_cm"
+            ])
+    except FileExistsError:
+        pass
+
+
+def log_sensor_data(sensor_id, distance_cm, toward_speed, threshold_cm):
+    with open(LOG_FILE, "a", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow([
+            datetime.now().isoformat(timespec="seconds"),
+            sensor_id,
+            f"{distance_cm:.2f}",
+            f"{toward_speed:.2f}",
+            f"{threshold_cm:.2f}"
+        ])
+
+
+def connect_pixhawk():
+    print("łączenie z Pixhawk...")
+
+    while True:
+        try:
+            vehicle = connect(
+                DRONE_PORT,
+                baud=115200,
+                wait_ready=True,
+                heartbeat_timeout=60
+            )
+            print("połączono z Pixhawk")
+            return vehicle
+
+        except APIException as e:
+            print(f"brak heartbeat: {e}")
+            time.sleep(3)
+
+        except Exception as e:
+            print(f"nie połączono: {e}")
+            time.sleep(3)
+
+
+def get_body_velocity(vehicle):
+    velocity = vehicle.velocity
+    yaw = vehicle.attitude.yaw
+
+    if velocity is None or yaw is None:
+        return 0.0, 0.0
+
+    vn, ve, _ = velocity
+
+    v_forward = vn * math.cos(yaw) + ve * math.sin(yaw)
+    v_right = -vn * math.sin(yaw) + ve * math.cos(yaw)
+
+    return v_forward, v_right
+
+
+def get_speed_toward_sensor(v_forward, v_right, sensor_angle_deg):
+    angle_rad = math.radians(sensor_angle_deg)
+    return v_forward * math.cos(angle_rad) + v_right * math.sin(angle_rad)
+
+
+def calculate_threshold_cm(toward_speed):
+    closing_speed = max(0.0, toward_speed)
+
+    threshold_cm = closing_speed * REACTION_TIME_S * 100.0
+
+    threshold_cm = min(threshold_cm, MAX_DIST_CM)
+
+    return threshold_cm
+
+
+def send_alert(vehicle, sensor_id):
+    message = f"obstacle {sensor_id}"
+
+    vehicle.message_factory.statustext_send(
+        mavutil.mavlink.MAV_SEVERITY_ALERT,
+        message.encode("utf-8")[:50]
+    )
+    vehicle.flush()
+
+
+def check_distance(vehicle, distance_cm, sensor_id, v_forward, v_right):
+    sensor_angle = SENSOR_ANGLES_DEG[sensor_id]
+    toward_speed = get_speed_toward_sensor(v_forward, v_right, sensor_angle)
+    threshold_cm = calculate_threshold_cm(toward_speed)
+
+    log_sensor_data(sensor_id, distance_cm, toward_speed, threshold_cm)
+
+    print(
+        f"Sensor {sensor_id}: "
+        f"dystans={distance_cm:.2f} cm, "
+        f"prędkość={toward_speed:.2f} m/s, "
+        f"próg={threshold_cm:.2f} cm"
+    )
+
+    if threshold_cm > 0.0 and distance_cm < threshold_cm:
+        send_alert(vehicle, sensor_id, distance_cm, threshold_cm)
+
+
+def main():
+    vehicle = None
+
+    try:
+        init_log_file()
+        vehicle = connect_pixhawk()
+
+        vehicle.message_factory.statustext_send(
+            mavutil.mavlink.MAV_SEVERITY_ALERT,
+            b"Companion computer connected"
+        )
+        vehicle.flush()
+
+        while True:
+            v_forward, v_right = get_body_velocity(vehicle)
+
+            d1 = sensor1.distance * 100.0
+            check_distance(vehicle, d1, 1, v_forward, v_right)
+            time.sleep(GAP)
+
+            d2 = sensor2.distance * 100.0
+            check_distance(vehicle, d2, 2, v_forward, v_right)
+            time.sleep(GAP)
+
+            d3 = sensor3.distance * 100.0
+            check_distance(vehicle, d3, 3, v_forward, v_right)
+            time.sleep(GAP)
+
+    except KeyboardInterrupt:
+        pass
+
+    finally:
+        if vehicle:
+            vehicle.close()
+
+
+if __name__ == "__main__":
+    main()
+        \end{lstlisting}
+
     \section{Testy}
+        W celu weryfikacji działania zbudowanego systemu wykonano szereg testów w trakcie rozwoju, które potem powtórzono po ukończeniu prac. Testy obejmowały 
+        zarówno sprawdzenie działania i parametrów użytego sprzętu, jak również poprawność działania napisanych programów.
         \subsection{Sprawdzenie poprawności działania systemu}
-        W celu weryfikacji działania zbudowanego systemu wykonano szereg testów w trakcie rozwoju, które potem powtórzono po ukończeniu prac.
-        Czujniki odległości zostały przetestowane poprzez ustawienie płaskiej przeszkody prostopadle do czujnika, w odległościach 30cm, 50cm, 1m, 2m i 4m. 
-        We wszystkich przypadkach wykonane pomiary nie odbiegały od rzeczywistej odległości powyżej 1cm różnicy, co jest wystarczającą dokładnością dla 
+        Czujniki odległości zostały przetestowane poprzez ustawienie płaskiej przeszkody prostopadle do czujnika, w odległościach 30~cm, 50~cm, 1~m, 2~m i 4~m. 
+        We wszystkich przypadkach wykonane pomiary nie odbiegały od rzeczywistej odległości powyżej 1~cm różnicy, co jest wystarczającą dokładnością dla 
         wykrywania przeszkód. W celu sprawdzenia działania programu biorącego pod uwagę prędkość zbliżania się do przeszkody wykonano imitację przeszkody 
         montowaną na BSP kilka centymetrów przed jednym z czujników odległości. Dron następnie był wznoszony w powietrze i rozpędzany do prędkości przekraczającej 
         minimalną wymaganą do wysłania ostrzeżenia. Próbę powtórzono dla wszystkich trzech czujników.\par
         Połączenie między komputerem pokładowym i asystującym jest weryfikowane poprzez wysłanie komunikatu o pomyślnym otwarciu połączenia. Komunikat ten może 
         być odczytany przy użyciu komputera z aplikacją Mission Planner.
         \subsection{Pobór prądu}
-        Pobór prądu Raspberry Pi w trakcie działania programu został zmierzony z użyciem miernika KWS-2302C. Pomiary wahały się pomiędzy 3,371W a 3,612W, w większości 
-        oscylując około 3,491W. Biorąc pod uwagę parametry akumulatora zasilającego komputer asystujący można oszacować czas pracy na jednym ładowaniu na około 10,5 godziny.
+        Pobór prądu Raspberry Pi w trakcie działania programu został zmierzony z użyciem miernika KWS-2302C. Pomiary wahały się pomiędzy 3.371~W a 3.612~W, w większości 
+        oscylując około 3.491~W. Biorąc pod uwagę parametry akumulatora zasilającego komputer asystujący można oszacować czas pracy na jednym ładowaniu na około 10.5 godziny.
         \subsection{Dokładność pomiarów odległości}
+        Czujniki odległości HC-SR04, pomimo tego samego oznaczenia, w zależności od producenta mogą różnić się parametrami takimi jak maksymalna odległość wykonywania pomiarów. 
+        Użycie ultradźwięków wiąże się też z problemami z wykrywaniem przeszkód ustawionych pod kątem, fala dźwiękowa odbita od przeszkody może nigdy nie wrócić do 
+        czujnika. W związku z tym wykonano testy z użyciem czujników wykorzystanych w projekcie. Czujniki były w stanie zarejestrować przeszkodę ustawioną prostopadle z 
+        maksymalnie 460~cm, powyżej tej odległości odczyty były niestabilne i większość pomiarów kończyła się niewykryciem wracającej fali ultradźwiękowej. 
+        Sprawdzono również wpływ nachylenia przeszkody od pozycji prostopadłej do czujnika na poprawność odczytów. Pomiary wykonano w odległościach: 50~cm, 
+        1~m, 2~m i 3~m. Pomiary wykazały:
+        \begin{itemize}
+            \item 50~cm--- odczyty poprawne niezależnie od kąta odchylenia przeszkody,
+            \item 1~m--- odczyty niepoprawne przy odchyleniu >50\textdegree,
+            \item 2~m--- odczyty niepoprawne przy odchyleniu >22\textdegree,
+            \item 3~m--- odczyty niepoprawne przy odchyleniu >12\textdegree.
+
+\end{itemize}
         \subsection{Czas reakcji systemu}
+        Przy wykrywaniu przeszkód przed poruszającym się pojazdem kluczowe jest odpowiednio niskie opóźnienie, tak aby osoba kierująca miała wystarczający  
+        czas na reakcję. W celu pomiaru opóźnień wykorzystano odpowiednio zmodyfikowany program~\ref{lst:colPrevention}. Na potrzeby pomiaru zmieniono warunki 
+        aktywacji systemu tak, aby pomiary pierwszego i drugiego czujnika nie spełniały warunków potrzebnych do wysłania powiadomienia. Warunek dla trzeciego czujnika 
+        został zmodyfikowany tak by był on spełniany za każdym razem. Dzięki takim ustawieniom pomiary wykonywane były przy założeniu najbardziej pesymistycznego 
+        scenariusza, gdzie przeszkoda pojawia się w idealnym momencie by wymagała przejścia przez pozostałe czujniki zanim zostanie wykryta. Program rozpoczynał 
+        pomiar czasu po ustanowieniu połączenia z komputerem pokładowym i przed rozpoczęciem pomiarów odległości. W pierwszej wersji programu pomiar rozpoczynany 
+        był ręcznie poprzez naciśnięcie klawisza. Klawisz był następnie naciskany ponownie w momencie usłyszenia ostrzeżenia odczytanego przez komputer z aplikacją 
+        Mission Planner połączoną z dronem, co kończyło pomiar i zapisywało czas. W drugiej wersji programu ręczne uruchamianie pomiaru zostało zastąpione uruchamianiem 
+        automatycznym po losowym czasie 5--20 sekund. Wprowadzenie nieprzewidywalności do pomiaru pozwoliło na pomiar opóźnienia włącznie z ludzkim czasem reakcji, 
+        co w tym przypadku jest bardziej przydatne od opóźnień samego systemu. Wyniki obu pomiarów zostały przedstawione w tabeli~\ref{tab:timers}
+        \begin{table}[H]
+    \centering
+    \caption{Pomiary czasu pomiędzy wykryciem przeszkody a reakcją użytkownika}
+    \begin{tabular}{|c|c|}
+        \hline
+        \textbf{Rozpoczynane ręcznie [s]} & \textbf{Rozpoczynane losowo [s]} \\
+        \hline
+        1.078  & 1.655  \\
+        \hline
+        0.905  & 1.399  \\
+        \hline
+        6.770  & 1.493  \\
+        \hline
+        1.339  & 1.388  \\
+        \hline
+        1.014  & 1.525  \\
+        \hline
+        0.862  & 1.289  \\
+        \hline
+        0.862  & 1.400  \\
+        \hline
+        0.775  & 1.482  \\
+        \hline
+        0.884  & 1.380  \\
+        \hline
+        0.710 &  1.519  \\
+        \hline
+    \end{tabular}
+    \label{tab:timers}
+\end{table}
     \section{Alternatywne rozwiązania}
         W trakcie pracy nad systemem zapobiegającym kolizjom powstały alternatywne rozwiązania i pomysły które nie trafiły do końcowej wersji. 
         Przykładowo program biorący pod uwagę prędkość drona przy decydowaniu o wysłaniu ostrzeżenia został napisany na podstawie wersji sprawdzającej 
@@ -512,7 +768,7 @@ if __name__ == "__main__":
         Użyte w tym przypadku ultradźwiękowe czujniki odległości nie są idealnymi urzadzeniami pomiarowymi. Wykorzystanie fali dźwiękowej odbijającej się od przeszkody do 
         określenia odległości wiąże się z ograniczeniami i podatnościami. Fala dźwiękowa, padająca na przeszkodę, odbije się różnie w zależności od jej materiału i kształtu. 
         Dobrze wygłuszający materiał taki jak grube płótno czy gąbka może zostać niewykryty przez czujnik ultradźwiękowy. Czujniki wykorzystujące ultradźwięki mają również problem 
-        z wykrywaniem przeszkód ustawionych pod zbyt dużym kątem. Idealne warunki pomiarowe to przeszkoda ustawiona prostopadle do czujnika, dla HC-SR04 dopuszczalne odchylenie to \mbox{15\textdegree\cite{web:HC-SR04:manual}}. 
+        z wykrywaniem przeszkód ustawionych pod zbyt dużym kątem. Idealne warunki pomiarowe to przeszkoda ustawiona prostopadle do czujnika. 
         Naukowcy Manabu Ishihara, Makoto Shiina i Shin-nosuke Suzuki przeprowadzili szereg eksperymentów z użyciem czujnika \mbox{ultradźwiękowego\cite{Ishihara2009UltrasonicWalls}} i odkryli że odległość od przeszkody ma 
         wpływ na dopuszczalny kąt pomiaru. Wraz ze skracaniem dystansu można pozwolić sobie na coraz większy kąt i zachowanie niezawodności czujnika. Alternatywą dla czujników ultradźwiękowych mogą być moduły oparte o 
         lasery podczerwone. Ponieważ wiązka lasera porusza się z prędkością światła, znacznie szybciej niż prędkość fali dźwiękowej, pomiary laserem są o wiele szybsze od tych wykonywanych przez czujnik ultradźwiękowy. 
