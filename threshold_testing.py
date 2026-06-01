@@ -15,7 +15,7 @@ DRONE_PORT = "/dev/serial/by-id/usb-Holybro_Pixhawk6C_450046001751333337363133-i
 
 REACTION_TIME_S = 1.6
 GAP = 0.05                  # 50 ms
-MAX_DIST_M = 4.5            # maximum reliable distance
+MAX_DIST_M = 4.5            # w metrach
 MAX_DIST_CM = MAX_DIST_M * 100.0
 LOG_FILE = "sensor_threshold_log.csv"
 
@@ -58,7 +58,7 @@ def log_sensor_data(sensor_id, distance_cm, toward_speed, threshold_cm):
 
 
 def connect_pixhawk():
-    print("Connecting to Pixhawk...")
+    print("łączenie z Pixhawk...")
 
     while True:
         try:
@@ -68,15 +68,15 @@ def connect_pixhawk():
                 wait_ready=True,
                 heartbeat_timeout=60
             )
-            print("Connected to Pixhawk")
+            print("połączono z Pixhawk")
             return vehicle
 
         except APIException as e:
-            print(f"No heartbeat yet: {e}")
+            print(f"brak heartbeat: {e}")
             time.sleep(3)
 
         except Exception as e:
-            print(f"Connection failed: {e}")
+            print(f"nie połączono: {e}")
             time.sleep(3)
 
 
@@ -110,8 +110,8 @@ def calculate_threshold_cm(toward_speed):
     return threshold_cm
 
 
-def send_alert(vehicle, sensor_id, distance_cm, threshold_cm):
-    message = f"Obstacle S{sensor_id}: {distance_cm:.0f}<{threshold_cm:.0f} cm"
+def send_alert(vehicle, sensor_id):
+    message = f"obstacle {sensor_id}"
 
     vehicle.message_factory.statustext_send(
         mavutil.mavlink.MAV_SEVERITY_ALERT,
@@ -129,9 +129,9 @@ def check_distance(vehicle, distance_cm, sensor_id, v_forward, v_right):
 
     print(
         f"Sensor {sensor_id}: "
-        f"distance={distance_cm:.2f} cm, "
-        f"speed={toward_speed:.2f} m/s, "
-        f"threshold={threshold_cm:.2f} cm"
+        f"dystans={distance_cm:.2f} cm, "
+        f"prędkość={toward_speed:.2f} m/s, "
+        f"próg={threshold_cm:.2f} cm"
     )
 
     if threshold_cm > 0.0 and distance_cm < threshold_cm:
