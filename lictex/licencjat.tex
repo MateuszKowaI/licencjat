@@ -149,25 +149,25 @@ odbywają loty bez pilota na pokładzie i bez możliwości zabierania pasażeró
 się odbywać zdalnie przez pilota naziemnego lub przez komputer, jeśli pojazd jest \mbox{autonomiczny\cite{web:easa:uavdef}}.
 
 Komputer pokładowy jest urządzeniem niezbędnym do działania BSP. Jego głównym zadaniem jest sterowanie silnikami pojazdu 
-oraz otrzymywanie i przetwarzanie sygnałów docierających z aparatury sterującej. W tym przypadku rolę komputera pokładowego pełni Pixhawk 6C.
+oraz otrzymywanie i przetwarzanie sygnałów docierających z układu sterowania. W tym przypadku rolę komputera pokładowego pełni Pixhawk 6C.
 
 Komputer asystujący to komputer znajdujący się na pokładzie BSP, połączony z komputerem pokładowym. Jego rolą jest wykonywanie zadań zbyt 
 skomplikowanych obliczeniowo by móc powierzyć je komputerowi pokładowemu lub wymagają elementów przez komputer pokładowy nieposiadanych i niewspieranych. 
 Komputerem asystującym w przypadku tego projektu jest Raspberry Pi 5B.
 
+Globalny System Nawigacji Satelitarnej (ang \textit{Global Navigation Satellite System}, skrót GNSS) to system pozwalający na pozycjonowanie i znajdowanie ścieżki używając do tego 
+sztucznych satelitów na orbicie Ziemi. Potocznie występuje pod nazwą GPS, w rzeczywistości jest to amerykańska sieć satelitów i jest jedną z kilku systemów składających się na GNSS.
 \section{Zadania i ograniczenia komputera pokładowego}
-        \subsection{Podstawowe zadania komputera pokładowego}
         Rolą każdego komputera pokładowego jest przede wszystkim sterowanie silnikami pojazdu którego jest częścią. Komputer pokładowy musi więc posiadać odpowiednie 
         interfejsy do komunikacji z silnikami oraz interfejs do otrzymywania poleceń. W przypadku komputerów pokładowych używanych w BSP wielowirnikowych niezbędny jest również żyroskop, 
-        dzięki któremu komputer pokładowy zna swoją pozycję i jest w stanie utrzymać pojazd poziomo lub odpowiednio odchylić go zgodnie z poleceniami które otrzyma.
-        \subsection{Opcjonalne zastosowania autopilota}
+        dzięki któremu komputer pokładowy zna swoją pozycję i jest w stanie utrzymać pojazd poziomo lub odpowiednio odchylić go zgodnie z poleceniami które otrzyma.\par
         W zależności od modelu komputera pokładowego oraz zainstalowanego na nim oprogramowania może on dodatkowo obsługiwać wiele urządzeń peryferyjnych i posługiwać się bardziej złożoną logiką.
         Przeciętny komputer pokładowy dostępny na rynku cywilnym oferuje możliwość podłączenia zewnętrznego modułu GPS czy kamery, a także samodzielnie przechowywać i wykonywać polecenia 
         pozwalające na lot autonomiczny. Standardem jest również możliwość ustawienia procedury bezpieczeństwa \textit{(ang. failsafe)}, która decyduje jak zachowa się pojazd w razie utraty podłączenia
         z kontrolerem naziemnym lub jakimkolwiek innym urządzeniem wydającym polecenia komputerowi pokładowemu.
-    \section{Rozszerzenie możliwości BSP dzięki komputerom asystującym}
+\section{Rozszerzenie możliwości BSP dzięki komputerom asystującym}
     Jeśli użytkownik chce wykorzystać swój BSP w bardziej nietypowy sposób, na drodze mogą stanąć mu ograniczenia sprzętowe. Komputery pokładowe oferują zazwyczaj niewielką moc obliczeniową
-    i ograniczoną ilość i różnorodność gniazd do podłączenia urządzeń peryferyjnych. Jednym ze sposobów przystosowania BSP do naszych wymagań jest użycie komputera asystującego który 
+    i ograniczoną liczbę i różnorodność interfejsów do podłączenia urządzeń peryferyjnych. Jednym ze sposobów przystosowania BSP do naszych wymagań jest użycie komputera asystującego który 
     rozszerzy możliwości jednostki. Przykładowo, użytkownik może chcieć użyć swojego BSP do monitorowania dużego obszaru. W tym celu chciałby zamontować kamery z wielu stron, jednak 
     użyty przez niego komputer pokładowy ma możliwość podpięcia tylko jednej kamery. Użycie komputera asystującego może być wtedy rozwiązaniem problemu. W zależności od użytego komputera 
     asystującego można użyć nawet tak złożonych obliczeniowo programów jak sztuczna sieć neuronowa analizująca dane z urządzeń wejściowych i wydająca polecenia jednostce. Sposób połączenia 
@@ -178,9 +178,9 @@ Komputerem asystującym w przypadku tego projektu jest Raspberry Pi 5B.
         \end{center}
         \caption{Schemat wybranych komponentów jednostki i połączenia między nimi}\label{rys:diag:dron}
         \end{figure}
-    \chapter{Szczegóły techniczne zbudowanego środowiska}
+\chapter{Elementy sprzętowe BSP}
     % zdjęcie gotowego drona po zrobieniu obudowy
-    \section{Lista komponentów i ich specyfikacja}
+\section{Lista komponentów i ich specyfikacja}
     Większość gotowych bezzałogowych pojazdów dostępnych na rynku to zamknięte systemy a ingerencje i modyfikacje są bardzo utrudnione, zarówno sprzętowo jak i w oprogramowaniu. 
     Samodzielna budowa jednostki z użyciem kupionych oddzielnie komponentów oraz oprogramowania open-source daje dużo większe możliwości w przystosowaniu platformy do 
     własnych wymagań i preferencji.
@@ -189,29 +189,29 @@ Komputerem asystującym w przypadku tego projektu jest Raspberry Pi 5B.
         z akumulatora do silników. Miejscem na montaż silników są cztery ramiona wykonane z nylonu poliamidowego, wzmocnione w środku poprzez dodanie prętów z włókna węglowego. Całość 
         opiera się na podwoziu z rurek z włókna węglowego połączonych plastikowymi łącznikami.
         \subsection{Napęd}
-        Pojazd napędzany jest przez cztery silniki bezszczotkowe AIR2216II osiągające do 272~W. Silniki bezszczotkowe wymagają zasilania prądem zmiennym trójfazowym, dlatego do ich działania 
-        potrzebne są moduły elektronicznej kontroli prędkości \textit{(ang. electronic speed controller)}. Moduły te otrzymują zasilanie prądem stałym z akumulatora oraz sygnał z komputera pokładowego 
-        sterujący prędkością obracania się silników. Następnie generuje prąd zmienny trójfazowy który wywołuje obrót silników. Moduły ESC zastosowane w zbudowanym pojeździe to BLHeli S 20A. 
-        Jednostka została wyposażona w śmigła T1045II o rozpiętości 260 milimetrów i szerokości do 30 milimetrów. Specyfikacja każdego z elementów napędu została pokazana na rysunku ~\ref{rys:dok:naped}.
+        Pojazd napędzany jest przez cztery silniki bezszczotkowe AIR2216II o mocy do 272~W każdy. Silniki bezszczotkowe wymagają zasilania prądem zmiennym trójfazowym, dlatego do ich działania 
+        potrzebne są moduły regulacji napięcia \textit{(ang. electronic speed controller)}. Moduły te zasilane są prądem stałym z akumulatora, który następnie zostaje przekształcony na prąd 
+        zmienny trójfazowy wywołujący obrót silników o zadanej prędkości. Prędkość jest regulowana za pomocą sygnału dochodzącego do ESC z komputera pokładowego. Moduły ESC zastosowane w zbudowanym pojeździe 
+        to BLHeli S 20A. Jednostka została wyposażona w śmigła T1045II o rozpiętości 260 milimetrów i szerokości do 30 milimetrów. Specyfikacja każdego z elementów napędu została pokazana na rysunku ~\ref{rys:dok:naped}.
             \begin{figure}[H]
             \begin{center}
                 \includegraphics[width=11cm]{X500MotorSpec_1024x1024.jpg}
             \end{center}
             \caption{Dokumentacja techniczna AIR2216II, BLHeli S 20A, T1045II. \mbox{Źródło:\cite{web:holybro:naped:dok}}\label{rys:dok:naped}}
             \end{figure}
-        \subsection{Zewnętrzny moduł GNSS}
+        \subsection{Zewnętrzny moduł nawigacji satelitarnej}
         Zastosowany w jednostce zewnętrzny moduł GNSS to M10 od firmy Holybro. Oferuje jednoczesne otrzymywanie informacji od czterech największych 
         systemów satelit geolokacyjnych: europejskich satelit Galileo, amerykańskich GPS, rosyjskich GLONASS i chińskich Bei Dou. Oferowana dokładność wyznaczonej pozycji to 
         2.0~m CEP, co oznacza że co najmniej 50\% pomiarów wskaże pozycję oddaloną o 2 metry lub mniej od rzeczywistej \mbox{pozycji\cite{web:holybro:m10gps}}.
         \subsection{Układ komunikacji z pilotem}
         BSP został przygotowany do utrzymywania dwóch rodzajów komunikacji z pilotem. Podstawowym kanałem komunikacji jest kontroler RadioMaster TX12 MKII pozwalający na zdalne 
-        sterowanie dronem wyposażonym w odbiornik radiowy RadioMaster RP4TD-M używając systemu ExpressLRS zapewniającego niezawodność i stabilność łącza nawet na dużych dystansach. 
+        sterowanie dronem wyposażonym w odbiornik radiowy RadioMaster RP4TD-M używając systemu ExpressLRS zapewniającego niezawodność i stabilność łącza nawet na dystansie 100~km\cite{web:ExpressLRS:maxdist}. 
         Drugim kanałem komunikacji jest system telemetrii Holybro SiK Telemetry Radio V3 w wersji 433~MHz. Moduł podłączony do komputera osobistego znajdującego się na ziemi w pobliżu 
         pilota pozwala na użycie aplikacji Mission Planner--- oprogramowania pozwalającego między innymi na śledzenie BSP na mapie czy odczyt bieżących \mbox{danych\cite{web:ardupilot:mission:planner}}.
         \subsection{Komputer pokładowy}
         Rolę komputera pokładowego pełni Pixhawk 6C. Wyposażony jest w dwa procesory: STM32H743 — 480MHz Cortex-M7 odpowiedzialny za działanie oprogramowania zainstalowanego na urządzeniu, 
         odczyt parametrów z sensorów, przetwarzanie informacji i przekazywanie poleceń dotyczących silników do drugiego procesora, w tym przypadku STM32F103 — 72 MHz Cortex-M3. Zadaniem 
-        drugiego procesora jest generowanie sygnałów PWM na podstawie otrzymanych danych i przekazywanie ich do modułów ESC. W przypadku wystąpienia problemów z pierwszym procesorem 
+        drugiego procesora jest generowanie sygnałów modulacji szerokości pulsu (ang \textit{pulse-width modulation}) na podstawie otrzymanych danych i przekazywanie ich do modułów ESC. W przypadku wystąpienia problemów z pierwszym procesorem 
         jest w stanie samodzielnie generować sygnał sterujący silnikami, jednak przez brak dostępu do czujników takich jak żyroskopy czy akcelerometry jego możliwości ograniczają się do 
         utrzymania kręcenia się śmigieł w celu spowolnienia upadku i minimalizacji uszkodzeń przy lądowaniu awaryjnym.
 
@@ -221,14 +221,33 @@ Komputerem asystującym w przypadku tego projektu jest Raspberry Pi 5B.
         magnetometr IST8310 pozwalający na określenie jego pozycji na podstawie pola magnetycznego Ziemi oraz barometr MS5611 pozwalający obliczyć wysokość nad ziemią na podstawie różnicy \mbox{ciśnień\cite{web:pixhawk6c:specs}}.
         Oprogramowaniem działającym na komputerze pokładowym jest ArduCopter w wersji 4.6.2.
         \subsection{Komputer asystujący}
-        Asystentem dla Pixhawk 6C jest mikrokomputer Raspberry Pi 5B. Posiada on czterordzeniowy procesor Arm Cortex-A76, 8~GB pamięci RAM oraz szereg sposobów na podłączenie urządzeń 
+        Asystentem dla Pixhawk 6C jest mikrokomputer Raspberry Pi 5B. Posiada on czterordzeniowy procesor Arm Cortex-A76, 8~GB pamięci RAM oraz szereg interfejsów pozwalających na podłączenie urządzeń 
         peryferyjnych, np. cztery gniazda USB czy 40 pinów GPIO. Zainstalowany na nim system operacyjny to Raspberry Pi OS będący portem Debiana Trixie.
         \subsection{Źródło zasilania}
         BSP zasilany jest za pomocą akumulatora litowo-jonowego Gens Ace G-Tech o pojemności 5000~mAh, napięciu 14.8~V i wadze 439~g. Za zasilanie komputera asystującego odpowiedzialny jest powerbank z baterią litowo-polimerową
          o pojemności 10000~mAh, napięciu 5~V, mocy maksymalnej 22.5~W i wadze 235~g. Możliwe jest zasilenie Raspberry Pi akumulatorem drona, wiąże się to jednak z ingerencją w gotowy układ zasilania oraz  koniecznością obniżenia napięcia z 14.8~V do 5~V. Problem 
          stanowią również silniki elektryczne napędzające jednostkę, ich zużycie prądu zmienia się bardzo dynamicznie co stwarza ryzyko spadku napięcia zasilającego komputer asystujący poniżej wymaganych 5~V. W przypadku Raspberry Pi 
         spadek napięcia poniżej 4.6~3V (±5\%) może skutkować obniżoną wydajnością komputera, nieprawidłowym działaniem podłączonych urządzeń peryferyjnych lub do nieprzewidywalnego zachowania urządzenia czy uszkodzenia danych na karcie pamięci.~\cite{web:raspberry:pi:documentation:power:supply} 
-        Z uwagi na potencjalne problemy i konieczność ingerencji w gotowy układ zasilania zastosowane zostało oddzielne źródło prądu dla komputera asystującego.
+        Aby uniknąć potencjalnych problemów i ingerencji w gotowy układ zasilania zastosowane zostało oddzielne źródło prądu dla komputera asystującego.
+        \subsection{Montaż komputerów}
+        Kontroler lotu Pixhawk 6C ma w zestawie dwustronną taśmę samoprzylepną pozwalającą na łatwy montaż komputera. Taśma ma dodatkowo warstwę pianki pomiędzy warstwami przylepnymi w celu amortyzacji wstrząsów i 
+        ochrony komputera przed uszkodzeniami mechanicznymi. Rozmiary kadłuba drona nie pozwalają na umieszczenie obu komputerów obok siebie a montaż jeden na drugim nie jest możliwe z użyciem taśmy. 
+        Z tego powodu zastąpiono ją elementami zaprojektowanymi w programie AutoCAD i wydrukowanymi na drukarce 3D. Rama montażowa dla Raspberry Pi widoczna jest na rysunku \ref{rys:uchwyt:raspberry}. 
+        Kształt uchwytu jest dopasowany tak, aby dało się go przymocować do kadłuba pomimo wystających z niego śrub. Do montażu ramy do BSP oraz mikrokomputera do ramy użyto śrub M2. Pomiędzy uchwytem a Raspberry Pi 
+        dodano piankę amortyzującą wstrząsy a mikrokomputer został przymocowany z użyciem mosiężnych sześciokątnych kolumn o długości 2~cm i gwintowanych otworach. Na kolumny została przykręcona druga rama \ref{rys:uchwyt:pixhawk} 
+        pozwalająca na montaż komputera pokładowego Pixhawk. Została ona zaprojektowana tak, by pozostawić odsłonięte chłodzenie Raspberry Pi i piny GPIO.
+        \begin{figure}[H]
+            \begin{center}
+                \includegraphics[width=11cm]{rama_raspberry.png}
+            \end{center}
+            \caption{Uchwyt montażowy dla Raspberry Pi widoczny od dołu\label{rys:uchwyt:raspberry}}
+            \end{figure}
+            \begin{figure}[H]
+            \begin{center}
+                \includegraphics[width=11cm]{rama_pixhawk.png}
+            \end{center}
+            \caption{Uchwyt montażowy dla Pixhawk 6C\label{rys:uchwyt:pixhawk}}
+            \end{figure}
 
     \section{Specyfikacja drona}
         Waga jednostki, wliczając w to komputer asystujący i jego źródło zasilania, wynosi 1715~g. Na podstawie wagi, specyfikacji \mbox{silników\cite{web:holybro:naped:dok}} oraz akumulatora można oszacować średni możliwy czas lotu. 
@@ -247,17 +266,17 @@ Komputerem asystującym w przypadku tego projektu jest Raspberry Pi 5B.
         \]
         Jeden silnik potrzebuje około 3.42~A, co dla czterech silników daje łącznie 13.67~A. Używając akumulatora o pojemności 5000~mAh daje to teoretyczne 21.95 minut lotu. Biorąc pod uwagę dodatkowe zużycie prądu przez komputer pokładowy oraz 
         zwiększone zużycie prądu przy wznoszeniu i manewrowaniu, bezpieczniejszym będzie przyjęcie marginesu błędu i określenie czasu lotu na około 19--20 minut. Oszacowanie maksymalnego czasu działania Raspberry Pi jest dużo trudniejsze, 
-        zależy to w dużym stopniu od złożoności programów na niej uruchomionych. Artykuł ogłaszający wypuszczenie na rynek Raspberry Pi 5 w wersji z 16~GB pamięci RAM określa zużycie w spoczynku na \mbox{2--3W\cite{web:raspberry:pi5:release:announcement}}, 
-        zakładając zużycie 3~W przy 10000~mAh i 5~V daje to około 16.7 godzin działania. Trzeba jednak wziąć pod uwagę że to ogłoszenie nie jest tak wiarygodnym źródłem jak oficjalna dokumentacja, która w tym przypadku nie wspomina o poborze mocy 
-        w stanie spoczynku. Pobór prądu w praktyce będzie też większy ze względu na uruchomione na mikrokomputerze programy. Opisane dalej testy wykazały że pobór mocy w stanie spoczynku wahają się między 3.177~W a 3.484~W, większość odczytów była zbliżona do 3.281~W. 
+        zależy to w dużym stopniu od złożoności programów na niej uruchomionych. Opisane dalej testy wykazały że pobór mocy w stanie spoczynku wahają się między 3.177~W a 3.484~W, mediana odczytów to 3.281~W. 
         Przy parametrach zastosowanego zasilania szacowany czas działania to 11 godzin i 15 minut.
 \chapter{Zastosowanie środowiska}
     \section{Wstępne założenia}
-        Komputer Raspberry Pi jest połączony z Pixhawk 6C za pomocą USB. W katalogu \texttt{\string~/uavproject} znajduje się wirtualne środowisko python oraz wszystkie programy współpracujące z dronem. Komunikacja z dronem możliwa jest dzięki bibliotece DroneKit 2.9.2. 
-        Użycie tej biblioteki ogranicza wersję pythona do nie nowszej niż 3.9.18, ponieważ od jakiegoś czasu biblioteka są nieutrzymywane i nie współpracuje z nowszymi wersjami pythona. Za pomocą komendy \texttt{source uavproject/venv/bin/activate}
+        Komputer Raspberry Pi jest połączony z Pixhawk 6C za pomocą USB. W katalogu \texttt{\string~/uavproject} znajduje się wirtualne środowisko python oraz wszystkie programy współpracujące z dronem. Komunikacja z dronem możliwa jest dzięki bibliotkom DroneKit 2.9.2 i 
+        PyMAVLink 2.4.49.
+        Użycie tych bibliotek ogranicza wersję pythona do nie nowszej niż 3.9.18, ponieważ od jakiegoś czasu biblioteka są nieaktualizowane i nie współpracują z nowszymi wersjami pythona. Za pomocą komendy \texttt{source uavproject/venv/bin/activate}
         uruchamiane jest wirtualne środowisko. Wewnątrz środowiska można testować napisane programy i instalować wymagane biblioteki. Pisanie programu najlepiej zacząć używając szablonu~\ref{lst:szablon}.
         \begin{lstlisting}[language=python, caption={Szablon programu działającego na komputerze asystującym}, label={lst:szablon}]
 from dronekit import connect, APIException
+from pymavlink import mavutil
 import os
 import time
 
@@ -322,7 +341,7 @@ if __name__ == "__main__":
         Bez zamknięcia połączenia każda kolejna próba uruchomienia programu zakończy się błędem, ponieważ urządzenie bez poprawnie zamkniętego połączenia będzie oznaczone jako zajęte i niedostępne.\par 
         Loty dronem najczęściej nie odbywają się w warunkach domowych, dlatego programy powinny się wykonywać automatycznie, bez potrzeby użycia klawiatury i monitora. W tym celu wykorzystany został skrypt~\ref{lst:autorunuav} zapisany w \texttt{/etc/systemd/system/autorunuav.service}. Po uruchomieniu Raspberry Pi 
         skrypt poczeka aż system będzie w pełni uruchomiony, po czym wykona program określony w parametrze \texttt{ExecStart} przy użyciu wirtualnego środowiska. W przypadku jeśli program przestanie działać skrypt odczeka pięć sekund i uruchomi go ponownie. Po każdej zmianie automatycznie uruchamianego programu lub 
-        jakichkolwiek innych zmian w skrypcie należy odświeżyć systemd komendą \texttt{sudo systemctl daemon-reload} oraz uruchomić skrypt za pomocą \texttt{sudo systemctl start autorunuav.service}. Wyjście programu można zobaczyć używając komendy \texttt{journalctl -u autorunuav.service -f}.
+        jakichkolwiek innych zmianach w skrypcie należy odświeżyć systemd komendą \texttt{sudo systemctl daemon-reload} oraz uruchomić skrypt za pomocą \texttt{sudo systemctl start autorunuav.service}. Wyjście programu można zobaczyć używając komendy \texttt{journalctl -u autorunuav.service -f}.
 
         \begin{lstlisting}[language=bash, caption={Skrypt wykonujący program po uruchomieniu komputera asystującego}, label={lst:autorunuav}]
 [Unit]
@@ -353,7 +372,19 @@ WantedBy=multi-user.target
         połączone równolegle do pinów w Raspberry Pi. Piny \texttt{TRIG} w czujnikach, wywołujące pomiar, są podłączone bezpośrednio do pinów GPIO. Wyjście \texttt{ECHO} czujników nie może być podłączone 
         do Raspberry Pi ze względu na różnicę w napięciach. W czujnikach HC-SR04 dla sygnału wychodzącego przez pin \texttt{ECHO} stan wysoki to 5~V. Takie napięcie jest odpowiednie dla mikrokomputera Arduino, 
         jednak stan wysoki dla pinów w Raspberry Pi to 3.3~V. Aby zapobiec uszkodzeniom należy obniżyć napięcie wychodzące z czujnika do bezpiecznych 3.3~V, co zostało osiągnięte z użyciem 
-        konwertera poziomów logicznych. Zaprojektowane i wydrukowane na drukarce 3D uchwyty pozwalają na zamontowanie czujników i konwertera na dronie oraz regulację ich pozycji w poziomie.
+        konwertera poziomów logicznych. Podobnie jak w przypadku komputerów, montaż konwertera stanów logicznych i czujników został zaprojektowany i wydrukowany w 3D.
+        \begin{figure}[H]
+            \begin{center}
+                \includegraphics[width=11cm]{rama_czujniki.png}
+            \end{center}
+            \caption{Rama montażowa do zamocowania konwertera stanów logicznych i uchwytów na czujniki\label{rys:rama:czujniki}}
+            \end{figure}
+        \begin{figure}[H]
+            \begin{center}
+                \includegraphics[width=11cm]{uchwyt_czujnik.png}
+            \end{center}
+            \caption{Uchwyt na jeden czujnik ultradźwiękowy\label{rys:uchwyt:czujnik}}
+            \end{figure}
         Program~\ref{lst:colPrevention} wywołuje wysłanie ostrzeżenia do pilota w przypadku jeśli wykryta zostanie przeszkoda oraz dron zbliża się do niej z odpowiednią prędkością. 
         Zmienne globalne na początku programu określają między innymi minimalną odległość i prędkość przy których program powinien wywołać ostrzeżenie, wymaga również określenia kątów pod jakimi 
         ustawione są czujniki. Wartość 0 oznacza czujnik zwrócony na wprost, wartości ujemne oznaczają odchylenie w lewo a wartości dodatnie oznaczają odchylenie w prawo. Dla wygody użytkownika 
