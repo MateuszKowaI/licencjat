@@ -145,7 +145,7 @@ Tu treść wstępu (który piszemy na końcu, po napisaniu całej pracy).
 
 Bezzałogowy statek powietrzny (skrót BSP) to kategoria pojazdów poruszających się w powietrzu 
 do której zaliczane są samoloty, śmigłowce i pojazdy wielowirnikowe (w tym drony), które 
-odbywają loty bez pilota na pokładzie i bez możliwości zabierania pasażerów. Sterowanie może 
+odbywają loty bez pilota na pokładzie. Sterowanie może 
 się odbywać zdalnie przez pilota naziemnego lub przez komputer, jeśli pojazd jest \mbox{autonomiczny\cite{web:easa:uavdef}}.
 
 Komputer pokładowy jest urządzeniem niezbędnym do działania BSP. Jego głównym zadaniem jest sterowanie silnikami pojazdu 
@@ -366,13 +366,15 @@ StandardError=journal
 WantedBy=multi-user.target
         \end{lstlisting}
 
-    \section{Ostrzeżenie przed zbliżającą się przeszkodą}
+    \section{Projekt urządzenia peryferyjnego--- system czujników odległości}
         W celu przetestowania zbudowanej platformy i zaprezentowania jednej z możliwości jej wykorzystania zbudowano system ostrzegania przed kolizją. 
         Wykrywanie przeszkód odbywa się z użyciem trzech ultradźwiękowych czujników odległości \mbox{HC-SR04\cite{web:HC-SR04:manual}}. Zasilanie 5~V oraz uziemienie są 
         połączone równolegle do pinów w Raspberry Pi. Piny \texttt{TRIG} w czujnikach, wywołujące pomiar, są podłączone bezpośrednio do pinów GPIO. Wyjście \texttt{ECHO} czujników nie może być podłączone 
         do Raspberry Pi ze względu na różnicę w napięciach. W czujnikach HC-SR04 dla sygnału wychodzącego przez pin \texttt{ECHO} stan wysoki to 5~V. Takie napięcie jest odpowiednie dla mikrokomputera Arduino, 
         jednak stan wysoki dla pinów w Raspberry Pi to 3.3~V. Aby zapobiec uszkodzeniom należy obniżyć napięcie wychodzące z czujnika do bezpiecznych 3.3~V, co zostało osiągnięte z użyciem 
-        konwertera poziomów logicznych. Podobnie jak w przypadku komputerów, montaż konwertera stanów logicznych i czujników został zaprojektowany i wydrukowany w 3D.
+        konwertera poziomów logicznych. Podobnie jak w przypadku komputerów, montaże konwertera stanów logicznych i czujników zostały zaprojektowane i wydrukowane w 3D. Każdy z trzech czujników został zamontowany za 
+        pomocą pionowych uchwytów widocznych na rysunku \ref{rys:uchwyt:czujnik}, które zostały przykręcone do platformy pokazanej na rysunku \ref{rys:rama:czujniki}. Platforma ma również miejsce na zamocowanie 
+        konwertera stanów logicznych. Całość została podwieszona z użyciem opasek zaciskowych na dwóch rurkach z włókna węglowego będących częścią kadłuba drona.
         \begin{figure}[H]
             \begin{center}
                 \includegraphics[width=11cm]{rama_czujniki.png}
@@ -385,25 +387,24 @@ WantedBy=multi-user.target
             \end{center}
             \caption{Uchwyt na jeden czujnik ultradźwiękowy\label{rys:uchwyt:czujnik}}
             \end{figure}
-        Program~\ref{lst:colPrevention} wywołuje wysłanie ostrzeżenia do pilota w przypadku jeśli wykryta zostanie przeszkoda oraz dron zbliża się do niej z odpowiednią prędkością. 
-        Zmienne globalne na początku programu określają między innymi minimalną odległość i prędkość przy których program powinien wywołać ostrzeżenie, wymaga również określenia kątów pod jakimi 
-        ustawione są czujniki. Wartość 0 oznacza czujnik zwrócony na wprost, wartości ujemne oznaczają odchylenie w lewo a wartości dodatnie oznaczają odchylenie w prawo. Dla wygody użytkownika 
-        kąty wyrażone są w stopniach. Po ustanowieniu połączenia z komputerem pokładowym program w nieskończonej pętli odczytuje odległości z czujników, zostawiając przerwę między odczytami równą 
-        wartości określonej w zmiennej \texttt{GAP}. W przypadku użycia wielu czujników obok siebie istnieje ryzyko że po wywołaniu pomiaru u jednego z czujników, przejdziemy do drugiego zanim poprzedni 
+    \section{Program wykrywający przeszkody}
+        Po zbudowaniu poprawnie działającego systemu czujników odległości opracowano program\ref{lst:program1} wykorzystujący je do ostrzegania pilota przed przeszkodami znajdującymi się przed dronem. 
+        Na początku programu znajdują się zmienne globalne pozwalające na łatwą zmianę kluczowych parametrów, takich jak odległość na której system powinien zareagować lub maksymalną 
+        odległość mierzoną przez czujniki. Następnym krokiem jest otworzenie połączenia z komputerem pokładowym w sposób ukazany wcześniej w szablonie \ref{lst:szablon}. Po pomyślnym 
+        połączeniu program wchodzi w nieskończoną pętlę, w której wykonuje pomiary za pomocą kolejnych czujników i porównuje odczytane odległości do progu ustalonego w zmiennej globalnej \texttt{THRESHOLD}. 
+        Jeżeli przeszkoda wykryta przez czujnik okaże się bliżej niż próg, program wyśle polecenie do komputera pokładowego po którym ten wyśle powiadomienie do pilota. Wysyłanie powiadomienia 
+        działa w ten sam sposób co powiadomienie wysyłane po pomyślnym otworzeniu połączenia z Pixhawk. Wartości zmiennych globalnych \texttt{MAX\_DIST} oraz \texttt{GAP} zostały ustalone dzięki testom opisanym w sekcji 3.5.3. 
+        Wartość \texttt{GAP} to odstęp w czasie pomiędzy kolejnymi odczytami. W przypadku użycia wielu czujników obok siebie istnieje ryzyko że po wywołaniu pomiaru u jednego z czujników, przejdziemy do drugiego zanim poprzedni 
         zakończy pomiar. W takiej sytuacji może się zdarzyć że fala ultradźwiękowa wysłana przez poprzedni czujnik dotrze do kolejnego, co skutkować będzie zaburzonym pomiarem i fałszywie krótkim zmierzonym dystansem. 
         Ryzyko wystąpienia takiego problemu jest największe gdy czujniki zwrócone są w tę samą stronę, w przypadku zbudowanego systemu ostrzegania ryzyko zaburzenia pomiaru z tego powodu jest znikome. 
-        Mimo wszystko pozostawienie odstępu jest wskazane, a odstęp 50ms nie jest wystarczająco długi aby uczynić program zawodnym przez zbyt rzadkie pomiary. Każda wartość pomiaru zwracana jest w postaci liczby 
+        Mimo wszystko pozostawienie odstępu jest wskazane, a odstęp 27~ms nie jest wystarczająco długi aby uczynić program zawodnym przez zbyt rzadkie pomiary. Każda wartość pomiaru zwracana jest w postaci liczby 
         zmiennoprzecinkowej pomiędzy 0 a 1, gdzie 0 oznacza 0~cm a 1 oznacza maksymalną odległość pomiaru określaną w zmiennej \texttt{MAX\_DIST}. Wartość pomiaru jest mnożona przez 100 i maksymalną odległość pomiaru w celu 
-        uzyskania wartości w centymetrach. Komputer Pixhawk dostarcza programowi informacji o prędkości drona i jego odchyleniu od kierunku północnego. Prędkość drona jest wyrażona w postaci trzech wartości: prędkości w kierunku północnym, 
-        wschodnim i w dół. Dzięki odchyleniu od kierunku północnego obliczana jest prędkość względem BSP. Program następnie oblicza prędkość względem danego czujnika, wykorzystując określony wcześniej kąt jego odchylenia względem przodu. 
-        Mając te dane program porównuje odczytaną z czujników odległość z określonym progiem aktywacji oraz obecną prędkość w kierunku w który skierowany jest czujnik z minimalną prędkością aktywującą ostrzeżenie. 
-        Jeśli odległość jest mniejsza a prędkość większa niż punkty aktywacji, program wywoła wysłanie ostrzeżenia.
-
-    \section{Kod programu}
-\begin{lstlisting}[language=python, caption={Program ostrzegający przed kolizją}, label={lst:colPrevention}]
+        uzyskania wartości w centymetrach.
+        \begin{lstlisting}[language=python, caption={Program ostrzegający o wykrytych przez czujniki przeszkodach}, label={lst:program1}]
 import time
 import math
-from dronekit import connect, APIException
+from dronekit import connect
+from pymavlink import mavutil
 
 from gpiozero import Device, DistanceSensor
 from gpiozero.pins.lgpio import LGPIOFactory
@@ -414,8 +415,8 @@ DRONE_PORT = "/dev/serial/by-id/usb-Holybro_Pixhawk6C_450046001751333337363133-i
 
 MIN_DISTANCE_CM = 30
 MIN_SPEED = 0.3 # w m/s
-GAP = 0.05 # 50ms
-MAX_DIST = 8
+GAP = 0.027 # 27ms
+MAX_DIST = 4.5
 
 SENSOR_ANGLES_DEG = {
     1: -45.0,
@@ -429,26 +430,7 @@ sensor3 = DistanceSensor(echo=22, trigger=25, max_distance=MAX_DIST)
 
 
 def connect_pixhawk():
-    print("Connecting to Pixhawk...")
-
-    while True:
-        try:
-            vehicle = connect(
-                DRONE_PORT,
-                baud=115200,
-                wait_ready=True,
-                heartbeat_timeout=60
-            )
-            print("Connected to Pixhawk")
-            return vehicle
-
-        except APIException as e:
-            print(f"No heartbeat yet: {e}")
-            time.sleep(3)
-
-        except Exception as e:
-            print(f"Connection failed: {e}")
-            time.sleep(3)
+    #[...]
 
 
 def get_body_velocity(vehicle):
@@ -527,13 +509,140 @@ def main():
 if __name__ == "__main__":
     main()
         \end{lstlisting}
+        \section{Prędkość jako jeden z warunków aktywacji}
+        Następnym wykonanym programem, ukazanym w listingu \ref{lst:program2} była wersja ostrzegająca pilota o przeszkodzie jedynie w sytuacji gdy dron zbliża się do niej z odpowiednio wysoką prędkością. Do zmiennych globalnych dodane zostały kąty 
+        pod jakimi ustawione są czujniki odległości oraz minimalna prędkość przy której program powinien zareagować. Oprócz wykonywania pomiarów program pobiera z komputera pokładowego informację o prędkości drona, która 
+        wyrażona jest w postaci trzech wartości, prędkości w kierunkach: północnym, wschodnim i w dół. Dzięki pobieranej z komputera pokładowego informacji o 
+        odchyleniu jednostki od kierunku północnego  obliczana jest prędkość względem samego BSP oraz prędkości względem czujników. Mając informacje o względnej prędkości i odczytach z czujników odległości program porównuje je z progami określonymi w zmiennych globalnych 
+        i decyduje czy wywołać wysłanie ostrzeżenia.
+        \begin{lstlisting}[language=python, caption={Program ostrzegający o zbliżaniu się do przeszkody}, label={lst:program2}]
+import time
+import math
+from dronekit import connect
+from pymavlink import mavutil
 
-    \section{Dynamiczne ustawianie odległości progu aktywacji}
-        Program wyżej miał ustawioną na stałe odległość, poniżej której wykryta przeszkoda wywoła wysłanie powiadomienia. Na jego podstawie powstała bardziej rozwinięta wersja. 
-        Zamiast jednego progu aktywacji definiowanego z góry, Program odczytuje prędkość drona i ustala próg dynamicznie, dla każdego czujnika oddzielnie. W tym celu wykorzystano 
-        pomiary czasu reakcji i ustalono średni czas na 1.6~s oraz maksymalną odległość mierzoną przez czujniki na 4.5~m. Na podstawie tych danych obliczana jest odległość, z jakiej 
-        pilot będzie w stanie zareagować na zbliżającą się przeszkodę. %TODO jakoś to ładniej napisać
-\begin{lstlisting}[language=python, caption={Program ostrzegający przed kolizjąaaaa}, label={lst:colPreventionaaa}]
+from gpiozero import Device, DistanceSensor
+from gpiozero.pins.lgpio import LGPIOFactory
+
+Device.pin_factory = LGPIOFactory()
+
+DRONE_PORT = "/dev/serial/by-id/usb-Holybro_Pixhawk6C_450046001751333337363133-if00"
+
+MIN_DISTANCE_CM = 30
+MIN_SPEED = 0.3 # w m/s
+GAP = 0.027 # 27ms
+MAX_DIST = 4.5
+
+SENSOR_ANGLES_DEG = {
+    1: -45.0,
+    2: 0.0,
+    3: 45.0
+}
+
+sensor1 = DistanceSensor(echo=17, trigger=23, max_distance=MAX_DIST)
+sensor2 = DistanceSensor(echo=27, trigger=24, max_distance=MAX_DIST)
+sensor3 = DistanceSensor(echo=22, trigger=25, max_distance=MAX_DIST)
+
+
+def connect_pixhawk():
+    while True:
+        try:
+            conn = mavutil.mavlink_connection(
+                DRONE_PORT,
+                baud=115200
+            )
+
+            conn.wait_heartbeat(timeout=60)
+            conn.close()
+
+            vehicle = connect(
+                DRONE_PORT,
+                baud=115200,
+                wait_ready=True
+            )
+
+            return vehicle
+
+        except Exception:
+            time.sleep(3)
+
+
+def get_body_velocity(vehicle):
+    velocity = vehicle.velocity
+    yaw = vehicle.attitude.yaw
+
+    if velocity is None or yaw is None:
+        return 0.0, 0.0
+
+    vn, ve, _ = velocity
+
+    v_forward = vn * math.cos(yaw) + ve * math.sin(yaw)
+    v_right = -vn * math.sin(yaw) + ve * math.cos(yaw)
+
+    return v_forward, v_right
+
+
+def get_speed_toward_sensor(v_forward, v_right, sensor_angle_deg):
+    angle_rad = math.radians(sensor_angle_deg)
+    return v_forward * math.cos(angle_rad) + v_right * math.sin(angle_rad)
+
+
+def send_alert(vehicle):
+    #[...]
+
+
+def check_distance(vehicle, distance_cm, sensor_id, v_forward, v_right):
+    sensor_angle = SENSOR_ANGLES_DEG[sensor_id]
+    toward_speed = get_speed_toward_sensor(v_forward, v_right, sensor_angle)
+
+    if distance_cm < MIN_DISTANCE_CM and toward_speed > MIN_SPEED:
+        send_alert(vehicle)
+
+
+def main():
+    vehicle = None
+
+    try:
+        vehicle = connect_pixhawk()
+
+        vehicle.message_factory.statustext_send(
+            mavutil.mavlink.MAV_SEVERITY_ALERT,
+            b"Companion computer connected"
+        )
+        vehicle.flush()
+
+        while True:
+            v_forward, v_right = get_body_velocity(vehicle)
+
+            d1 = sensor1.distance * 100 * MAX_DIST
+            check_distance(vehicle, d1, 1, v_forward, v_right)
+            time.sleep(GAP)
+
+            d2 = sensor2.distance * 100 * MAX_DIST
+            check_distance(vehicle, d2, 2, v_forward, v_right)
+            time.sleep(GAP)
+
+            d3 = sensor3.distance * 100 * MAX_DIST
+            check_distance(vehicle, d3, 3, v_forward, v_right)
+            time.sleep(GAP)
+
+    except KeyboardInterrupt:
+        pass
+
+    finally:
+        if vehicle:
+            vehicle.close()
+
+
+if __name__ == "__main__":
+    main()
+        \end{lstlisting}
+    \section{Dynamiczne ustawianie progu odległości}
+    Poprzednie programy miały próg odległości określony w zmiennej globalnej. W tej wersji próg jest obliczany na bieżąco na podstawie prędkości drona oraz czasu potrzebnego na reakcję. 
+    Zamiast jednego progu aktywacji definiowanego z góry, Program odczytuje
+prędkość drona i ustala próg dynamicznie, dla każdego czujnika oddzielnie. W tym celu wykorzystano pomiary czasu reakcji i ustalono średni czas na 1.6 s .Na podstawie tych danych obliczana jest
+odległość, z jakiej pilot będzie w stanie zareagować na zbliżającą się przeszkodę.
+\begin{lstlisting}[language=python, caption={Program ostrzegający o zbliżaniu się do przeszkody}, label={lst:program2}]
 import time
 import math
 import csv
@@ -550,7 +659,7 @@ Device.pin_factory = LGPIOFactory()
 DRONE_PORT = "/dev/serial/by-id/usb-Holybro_Pixhawk6C_450046001751333337363133-if00"
 
 REACTION_TIME_S = 1.6
-GAP = 0.05                  # 50 ms
+GAP = 0.027                  # 27 ms
 MAX_DIST_M = 4.5            # w metrach
 MAX_DIST_CM = MAX_DIST_M * 100.0
 LOG_FILE = "sensor_threshold_log.csv"
@@ -594,46 +703,15 @@ def log_sensor_data(sensor_id, distance_cm, toward_speed, threshold_cm):
 
 
 def connect_pixhawk():
-    print("łączenie z Pixhawk...")
-
-    while True:
-        try:
-            vehicle = connect(
-                DRONE_PORT,
-                baud=115200,
-                wait_ready=True,
-                heartbeat_timeout=60
-            )
-            print("połączono z Pixhawk")
-            return vehicle
-
-        except APIException as e:
-            print(f"brak heartbeat: {e}")
-            time.sleep(3)
-
-        except Exception as e:
-            print(f"nie połączono: {e}")
-            time.sleep(3)
+    #[...]
 
 
 def get_body_velocity(vehicle):
-    velocity = vehicle.velocity
-    yaw = vehicle.attitude.yaw
-
-    if velocity is None or yaw is None:
-        return 0.0, 0.0
-
-    vn, ve, _ = velocity
-
-    v_forward = vn * math.cos(yaw) + ve * math.sin(yaw)
-    v_right = -vn * math.sin(yaw) + ve * math.cos(yaw)
-
-    return v_forward, v_right
+    #[...]
 
 
 def get_speed_toward_sensor(v_forward, v_right, sensor_angle_deg):
-    angle_rad = math.radians(sensor_angle_deg)
-    return v_forward * math.cos(angle_rad) + v_right * math.sin(angle_rad)
+    #[...]
 
 
 def calculate_threshold_cm(toward_speed):
@@ -647,13 +725,7 @@ def calculate_threshold_cm(toward_speed):
 
 
 def send_alert(vehicle, sensor_id):
-    message = f"obstacle {sensor_id}"
-
-    vehicle.message_factory.statustext_send(
-        mavutil.mavlink.MAV_SEVERITY_ALERT,
-        message.encode("utf-8")[:50]
-    )
-    vehicle.flush()
+    #[...]
 
 
 def check_distance(vehicle, distance_cm, sensor_id, v_forward, v_right):
@@ -713,9 +785,8 @@ def main():
 if __name__ == "__main__":
     main()
         \end{lstlisting}
-
     \section{Testy}
-        W celu weryfikacji działania zbudowanego systemu wykonano szereg testów w trakcie rozwoju, które potem powtórzono po ukończeniu prac. Testy obejmowały 
+        W celu weryfikacji działania zbudowanego systemu wykonano szereg testów  obejmujących
         zarówno sprawdzenie działania i parametrów użytego sprzętu, jak również poprawność działania napisanych programów.
         \subsection{Sprawdzenie poprawności działania systemu}
         Czujniki odległości zostały przetestowane poprzez ustawienie płaskiej przeszkody prostopadle do czujnika, w odległościach 30~cm, 50~cm, 1~m, 2~m i 4~m. 
@@ -784,12 +855,12 @@ if __name__ == "__main__":
     \label{tab:timers}
 \end{table}
     \section{Alternatywne rozwiązania}
-        W trakcie pracy nad systemem zapobiegającym kolizjom powstały alternatywne rozwiązania i pomysły które nie trafiły do końcowej wersji. 
+        W trakcie pracy nad systemem zapobiegającym kolizjom powstały alternatywne rozwiązania i pomysły. 
         Przykładowo program biorący pod uwagę prędkość drona przy decydowaniu o wysłaniu ostrzeżenia został napisany na podstawie wersji sprawdzającej 
         jedynie odległość od przeszkody. W zależności od preferencji użytkownika uzależnienie ostrzeżeń od prędkości może być niepożądane.\par
         Problem z różnicą napięć między stanem wysokim dla czujników odległości a stanem wysokim dla pinów GPIO w Raspberry Pi może być rozwiązany 
         na inne sposoby niż z życiem konwertera stanów logicznych. Istnieje możliwość stworzenia dzielnika napięcia z pomocą dwóch odpowiednio dobranych rezystorów. 
-        Z powodu braku takowych pod ręką ta możliwość nie została jednak przetestowana. Podczas prac, aby przyspieszyć budowę platformy i przejść do oprogramowania, 
+        Z powodu braku takowych pod ręką ta możliwość nie została jednak przetestowana. Podczas prac 
         czujniki odległości zostały podłączone do Arduino Nano. Wywoływanie pomiarów i obliczanie na ich podstawie zmierzonej odległości odbywało się na mikrokontrolerze, a wyniki 
         przesyłane były do Raspberry Pi dzięki połączeniu USB. Takie rozwiązanie wprowadza jednak niepotrzebnie dodatkowe urządzenie do układu oraz zwiększa jego zużycie energii przez 
         konieczność zasilenia mikrokontrolera. W przypadku gdy Raspberry Pi będzie działać z niedostatecznym zasilaniem może ograniczyć prąd idący do urządzeń połączonych przez USB do \mbox{600mA\cite{web:raspberry:pi:documentation:power:supply}}, 
@@ -804,7 +875,7 @@ if __name__ == "__main__":
         wpływ na dopuszczalny kąt pomiaru. Wraz ze skracaniem dystansu można pozwolić sobie na coraz większy kąt i zachowanie niezawodności czujnika. Alternatywą dla czujników ultradźwiękowych mogą być moduły oparte o 
         lasery podczerwone. Ponieważ wiązka lasera porusza się z prędkością światła, znacznie szybciej niż prędkość fali dźwiękowej, pomiary laserem są o wiele szybsze od tych wykonywanych przez czujnik ultradźwiękowy. 
         Używanie wielu czujników laserowych nie wiąże się też z ryzykiem zaburzania odczytów przez siebie nawzajem, co w praktyce eliminuje potrzebę ustawiania opóźnień między pomiarami. Z drugiej strony użycie lasera sprawia że 
-        obiekty szklane lub odbijające światło nie zostaną poprawnie wykryte. Czujniki wykorzystujące laser podczerwony są też zazwyczaj droższe niż czujniki ultradźwiękowe. Zastosowanie czujników HC-SR04 motywowane było głównie ich niską 
+        obiekty szklane lub zbyt odbijające światło mogą nie zostać poprawnie wykryte. Czujniki wykorzystujące laser podczerwony są też zazwyczaj droższe niż czujniki ultradźwiękowe. Zastosowanie czujników HC-SR04 motywowane było głównie ich niską 
         ceną oraz dostępnością, jednak wymienione wcześniej zalety czujników laserowych czynią z nich wartą przemyślenia alternatywę.
 
 \chapter{Potencjalne ścieżki rozwoju projektu}
