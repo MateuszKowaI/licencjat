@@ -11,12 +11,16 @@
 \usepackage{amssymb} % to też do dodatkowych symboli, też przydatne
 \usepackage{amsthm}
 \usepackage{xcolor}
+\usepackage{pdfpages}
+\usepackage{caption}
 \usepackage[pdftex,
             left=1.1in,right=1.1in,
             top=1.1in,bottom=1.1in]{geometry} % marginesy
 \usepackage{float}
 \usepackage[font=small,labelfont=bf]{caption}
-\usepackage{cite}
+%\usepackage{cite}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning}
 
 \usepackage[colorlinks=true]{hyperref} % odnośniki interaktywne w PDFie
 \hypersetup{allcolors=blue} % odnośniki proszę zostawić kolorowe -- a jeśli ktoś nie lubi to zmienić na czarne dopiero w ostatniej wersji!
@@ -58,7 +62,11 @@
 \def\lstfloatautorefname{Listing}
 
 % jesli potrzeba, można oczywiście wstawić inne pakiety i swoje definicje...
-
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{url}
+\usepackage[colorlinks=true]{hyperref}
+\usepackage{doi}
+\hypersetup{allcolors=blue}
 
 
 % definicje nagłówków i stopek
@@ -78,7 +86,7 @@
 % interlinia
 \linespread{1.25}
 
-\bibliographystyle{plain}
+\bibliographystyle{plainnat}
 
 \begin{document}
 \begin{titlepage}
@@ -172,12 +180,12 @@ sztucznych satelitów na orbicie Ziemi. Potocznie występuje pod nazwą GPS, w r
     użyty przez niego komputer pokładowy ma możliwość podpięcia tylko jednej kamery. Użycie komputera asystującego może być wtedy rozwiązaniem problemu. W zależności od użytego komputera 
     asystującego można użyć nawet tak złożonych obliczeniowo programów jak sztuczna sieć neuronowa analizująca dane z urządzeń wejściowych i wydająca polecenia jednostce. Sposób połączenia 
     komputera asystującego oraz połączeń dających użytkownikowi kontrolę nad dronem i informacje zwrotne zostały przedstawione na rysunku ~\ref{rys:diag:dron}.
-    \begin{figure}[b!]
-        \begin{center}
-            \includegraphics[width=15cm]{bsp_system_diagram.png}
-        \end{center}
-        \caption{Schemat wybranych komponentów jednostki i połączenia między nimi}\label{rys:diag:dron}
-        \end{figure}
+    \clearpage
+\begin{center}
+    \includegraphics[page=1,width=0.95\textwidth,height=0.85\textheight,keepaspectratio]{dron_diagram.drawio.pdf}
+    \captionof{figure}{Schemat wybranych komponentów jednostki i połączenia między nimi}
+    \label{rys:diag:dron}
+\end{center}
 \chapter{Elementy sprzętowe BSP}
     % zdjęcie gotowego drona po zrobieniu obudowy
 \section{Lista komponentów i ich specyfikacja}
@@ -658,7 +666,7 @@ Device.pin_factory = LGPIOFactory()
 
 DRONE_PORT = "/dev/serial/by-id/usb-Holybro_Pixhawk6C_450046001751333337363133-if00"
 
-REACTION_TIME_S = 1.6
+REACTION_TIME_S = 1.5
 GAP = 0.027                  # 27 ms
 MAX_DIST_M = 4.5            # w metrach
 MAX_DIST_CM = MAX_DIST_M * 100.0
@@ -823,7 +831,9 @@ if __name__ == "__main__":
         był ręcznie poprzez naciśnięcie klawisza. Klawisz był następnie naciskany ponownie w momencie usłyszenia ostrzeżenia odczytanego przez komputer z aplikacją 
         Mission Planner połączoną z dronem, co kończyło pomiar i zapisywało czas. W drugiej wersji programu ręczne uruchamianie pomiaru zostało zastąpione uruchamianiem 
         automatycznym po losowym czasie 5--20 sekund. Wprowadzenie nieprzewidywalności do pomiaru pozwoliło na pomiar opóźnienia włącznie z ludzkim czasem reakcji, 
-        co w tym przypadku jest bardziej przydatne od opóźnień samego systemu. Wyniki obu pomiarów zostały przedstawione w tabeli~\ref{tab:timers}
+        co w tym przypadku jest bardziej przydatne od opóźnień samego systemu. Wyniki obu pomiarów zostały przedstawione w tabeli~\ref{tab:timers}. Przy przyjęciu 
+        maksymalnej odległości działania czujników odległości równej 4.5~m i czasie reakcji zaokrąglonym do 1.5~s zbudowany system będzie w stanie ostrzec pilota odpowiednio 
+        szybko jeśli dron będzie leciał z prędkością nie wyższą niż 3~m/s.
         \begin{table}[H]
     \centering
     \caption{Pomiary czasu pomiędzy wykryciem przeszkody a reakcją użytkownika}
@@ -831,19 +841,19 @@ if __name__ == "__main__":
         \hline
         \textbf{Rozpoczynane ręcznie [s]} & \textbf{Rozpoczynane losowo [s]} \\
         \hline
-        1.078  & 1.655  \\
+        0.625  & 1.251  \\
         \hline
-        0.905  & 1.399  \\
+        0.610  & 1.399  \\
         \hline
-        6.770  & 1.493  \\
+        0.729  & 1.493  \\
         \hline
-        1.339  & 1.388  \\
+        0.685  & 1.388  \\
         \hline
-        1.014  & 1.525  \\
+        0.739  & 1.525  \\
         \hline
         0.862  & 1.289  \\
         \hline
-        0.862  & 1.400  \\
+        0.589  & 1.400  \\
         \hline
         0.775  & 1.482  \\
         \hline
@@ -875,14 +885,48 @@ if __name__ == "__main__":
         wpływ na dopuszczalny kąt pomiaru. Wraz ze skracaniem dystansu można pozwolić sobie na coraz większy kąt i zachowanie niezawodności czujnika. Alternatywą dla czujników ultradźwiękowych mogą być moduły oparte o 
         lasery podczerwone. Ponieważ wiązka lasera porusza się z prędkością światła, znacznie szybciej niż prędkość fali dźwiękowej, pomiary laserem są o wiele szybsze od tych wykonywanych przez czujnik ultradźwiękowy. 
         Używanie wielu czujników laserowych nie wiąże się też z ryzykiem zaburzania odczytów przez siebie nawzajem, co w praktyce eliminuje potrzebę ustawiania opóźnień między pomiarami. Z drugiej strony użycie lasera sprawia że 
-        obiekty szklane lub zbyt odbijające światło mogą nie zostać poprawnie wykryte. Czujniki wykorzystujące laser podczerwony są też zazwyczaj droższe niż czujniki ultradźwiękowe. Zastosowanie czujników HC-SR04 motywowane było głównie ich niską 
+        obiekty szklane lub zbyt odbijające światło (np. lustro) mogą nie zostać poprawnie wykryte. Czujniki wykorzystujące laser podczerwony są też zazwyczaj droższe niż czujniki ultradźwiękowe. Zastosowanie czujników HC-SR04 motywowane było głównie ich niską 
         ceną oraz dostępnością, jednak wymienione wcześniej zalety czujników laserowych czynią z nich wartą przemyślenia alternatywę.
 
 \chapter{Potencjalne ścieżki rozwoju projektu}
-    \section{Półautonomiczny system zapobiegania kolizjom}
-    \section{Wielokierunkowy monitoring}
-    \section{Sieć neuronowa rozpoznawanie obiektów z obrazu kamery}
-    \section{mapa 3d lidar}
+    \subsubsection*{Wielokierunkowy monitoring}
+        Mikrokomputer Raspberry Pi oferuje dwa interfejsy CAM/DISP dedykowane pod podłączenie kamer oraz cztery porty USB, co pozwala na podłączenie do sześciu kamer i wykorzystanie drona 
+        do monitoringu. W przypadku sterowania dronem za pomocą programu na komputerze asystującym wymagany jest jeden port USB, w tym przypadku ilość kamer ogranicza się do pięciu. 
+        Raspberry Pi mogłoby odpowiadać za odbieranie obrazu z kamer, jego zapis lub przesyłanie do operatora. Obraz z kamer mógłby być przesyłany z Raspberry Pi do operatora bezprzewodowo, 
+        na przykład przez Wi-Fi, modem LTE/5G albo osobny moduł radiowy przeznaczony do transmisji wideo. W prostszym rozwiązaniu Raspberry Pi mogłoby tworzyć własną sieć Wi-Fi, z którą 
+        łączyłby się laptop operatora, a podgląd obrazu byłby dostępny w aplikacji albo przez stronę internetową. Przy większych odległościach można byłoby wykorzystać modem 
+        komórkowy LTE/5G, który pozwala przesyłać obraz przez Internet, chociaż wymaga to zasięgu sieci i zwykle daje większe opóźnienia. Inną możliwością jest zastosowanie 
+        dedykowanego połączenia radiowego, który zapewnia bardziej stabilną transmisję na krótkich i średnich dystansach. W praktyce należałoby dobrać sposób transmisji do wymaganego 
+        zasięgu, jakości obrazu, dopuszczalnego opóźnienia oraz dostępnego zasilania.
+    \subsubsection*{Ograniczenie obszaru lotu}
+        Program napisany w pythonie mógłby mieć zapisane współrzędne granic terenu, po którym dron może się poruszać. Następnie, korzystając z danych pobieranych z komputera pokładowego, 
+        system sprawdzałby na bieżąco, czy dron nadal znajduje się w dozwolonej strefie. W przypadku zbliżania się do granicy lub jej przekroczenia Raspberry Pi mogłoby wysłać ostrzeżenie 
+        do pilota, podobnie jak opisane w rozdziale trzecim ostrzeżenia o przeszkodach. Takie rozwiązanie mogłoby pełnić funkcję dodatkowego zabezpieczenia.
+    \subsubsection*{Analiza obrazu z kamery przez sieć neuronową}
+        Wybór Raspberry Pi 5B jako komputera asystującego pozwala na uruchomienie na nim sieci nieuronowej i przykładowo wykorzystania jej do analizy obrazu z kamery. Dron mógłby latać nad określonym obszarem 
+        i nagrywać obraz, a Raspberry Pi analizowałoby klatki z kamery w czasie rzeczywistym. Przykładowym zastosowaniem może być obserwacja dzikich zwierząt. W momencie, gdy sieć 
+        neuronowa rozpoznałaby zwierzę w obrazie z kamery, program mógłby automatycznie zapisać daną klatkę jako zdjęcie. Dodatkowo w osobnym pliku tekstowym można byłoby zapisać 
+        nazwę rozpoznanego zwierzęcia, godzinę wykonania zdjęcia oraz współrzędne geograficzne drona w tym momencie. Dzięki temu system nie musiałby zapisywać i analizować całego 
+        nagrania ręcznie, tylko automatycznie oznaczałby najważniejsze momenty lotu.
+    \subsubsection*{Mapowanie terenu}
+        Dron z komputerem Raspberry Pi można byłoby również wykorzystać do mapowania terenu. W takim przypadku do platformy można dodać czujnik odległości, na przykład LiDAR, 
+        radar lub laserowy czujnik podczerwieni, który mierzyłby odległość od przeszkód i powierzchni terenu. Podczas lotu Raspberry Pi zbierałoby dane z czujnika razem z 
+        informacją o pozycji drona, a następnie można byłoby na ich podstawie tworzyć mapę otoczenia, w tym również uproszczony model 3D. Takie rozwiązanie mogłoby być 
+        przydatne przy badaniu trudno dostępnych obszarów, dokumentowaniu terenu, analizie przeszkód albo tworzeniu map wykorzystywanych później przez algorytmy autonomicznego lotu.
+    \subsubsection*{Mobilna stacja pomiarowa}
+        Zbudowaną platformę można wykorzystać w roli mobilnej stacji pomiarowej. Do Raspberry Pi można podłączyć różne czujniki środowiskowe, na przykład czujnik temperatury, 
+        wilgotności, ciśnienia atmosferycznego albo jakości powietrza. Dron mógłby wykonywać pomiary w różnych punktach i na różnych wysokościach, a program zapisywałby wyniki razem 
+        z czasem oraz współrzędnymi GPS. W ten sposób można byłoby tworzyć przestrzenny zapis warunków środowiskowych na badanym obszarze. Takie rozwiązanie mogłoby znaleźć 
+        zastosowanie na przykład w monitoringu zanieczyszczeń, prostych badaniach meteorologicznych albo analizie warunków w miejscach, do których trudno dotrzeć pieszo. W przypadku 
+        wykonywania pomiarów podczas lotu niemożliwy byłby pomiar prędkości wiatru z powodu zaburzeń wprowadzanych przez śmigła drona, możliwe jest to natomiast jeśli pomiary wykonywane 
+        były statycznie, po wylądowaniu.
+    \subsubsection*{Autonomiczne lądowanie}
+        Lądowanie statkiem powietrznym potrafi sprawić trudności, szczególnie niedoświadczonym pilotom lub przy złych warunkach atmosferycznych. Rozwiązaniem tego problemu może być 
+        system autonomicznego lądowania. W tym rozwiązaniu kamera zamontowana od spodu drona obserwowałaby teren pod platformą, a program na Raspberry Pi próbowałby rozpoznać 
+        określony wzór znajdujący się na lądowisku, na przykład specjalny znacznik lub namalowany symbol. Po przełączeniu drona w odpowiedni tryb lotu, system mógłby obliczać 
+        położenie drona względem środka znacznika i wysyłać do autopilota odpowiednie korekty ruchu. Dzięki temu dron mógłby autonomicznie ustawić się nad lądowiskiem i wylądować 
+        możliwie blisko jego środka. Takie rozwiązanie byłoby przydatne zwłaszcza wtedy, gdy dron ma wracać do konkretnej stacji dokującej albo lądować w ograniczonej przestrzeni.
+
 \addcontentsline{toc}{chapter}{Bibliografia} % też ręczne dodanie do spisu treści, jak Wstęp
 \label{sec:bibliografia}
 \bibliography{MKowalBibliografia}
