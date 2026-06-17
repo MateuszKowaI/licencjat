@@ -74,7 +74,7 @@ def check_area(point, polygon):
         )
 
         if intersects:
-            inside = True
+            inside = not inside
 
         j = i
 
