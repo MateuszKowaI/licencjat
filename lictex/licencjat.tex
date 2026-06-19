@@ -163,15 +163,15 @@ Komputer asystujący to komputer znajdujący się na pokładzie BSP, połączony
 skomplikowanych obliczeniowo by móc powierzyć je komputerowi pokładowemu lub wymagają elementów przez komputer pokładowy nieposiadanych i niewspieranych. 
 Komputerem asystującym w przypadku tego projektu jest Raspberry Pi 5B.
 
-Globalny System Nawigacji Satelitarnej (ang \textit{Global Navigation Satellite System}, skrót GNSS) to system pozwalający na pozycjonowanie i znajdowanie ścieżki używając do tego 
-sztucznych satelitów na orbicie Ziemi. Potocznie występuje pod nazwą GPS, w rzeczywistości jest to amerykańska sieć satelitów i jest jedną z kilku systemów składających się na GNSS.
+Globalny System Nawigacji Satelitarnej (ang. \textit{Global Navigation Satellite System}, skrót GNSS) to system pozwalający na pozycjonowanie i znajdowanie ścieżki używając do tego 
+sztucznych satelitów na orbicie Ziemi~\cite{web:euspa:gnss}. Potocznie występuje pod nazwą GPS, w rzeczywistości jest to amerykańska sieć satelitów i jest jedną z kilku systemów składających się na GNSS.
 \section{Zadania i ograniczenia komputera pokładowego}
         Rolą każdego komputera pokładowego jest przede wszystkim sterowanie silnikami pojazdu którego jest częścią. Komputer pokładowy musi więc posiadać odpowiednie 
         interfejsy do komunikacji z silnikami oraz interfejs do otrzymywania poleceń. W przypadku komputerów pokładowych używanych w BSP wielowirnikowych niezbędny jest również żyroskop, 
         dzięki któremu komputer pokładowy zna swoją pozycję i jest w stanie utrzymać pojazd poziomo lub odpowiednio odchylić go zgodnie z poleceniami które otrzyma.\par
         W zależności od modelu komputera pokładowego oraz zainstalowanego na nim oprogramowania może on dodatkowo obsługiwać wiele urządzeń peryferyjnych i posługiwać się bardziej złożoną logiką.
         Przeciętny komputer pokładowy dostępny na rynku cywilnym oferuje możliwość podłączenia zewnętrznego modułu GPS czy kamery, a także samodzielnie przechowywać i wykonywać polecenia 
-        pozwalające na lot autonomiczny. Standardem jest również możliwość ustawienia procedury bezpieczeństwa \textit{(ang. failsafe)}, która decyduje jak zachowa się pojazd w razie utraty podłączenia
+        pozwalające na lot autonomiczny. Standardem jest również możliwość ustawienia procedury bezpieczeństwa (ang. \textit{failsafe)}~\cite{web:ardupilot:failsafe}, która decyduje jak zachowa się pojazd w razie utraty podłączenia
         z kontrolerem naziemnym lub jakimkolwiek innym urządzeniem wydającym polecenia komputerowi pokładowemu.
 \section{Rozszerzenie możliwości BSP dzięki komputerom asystującym}
     Jeśli użytkownik chce wykorzystać swój BSP w bardziej nietypowy sposób, na drodze mogą stanąć mu ograniczenia sprzętowe. Komputery pokładowe oferują zazwyczaj niewielką moc obliczeniową
@@ -193,12 +193,12 @@ sztucznych satelitów na orbicie Ziemi. Potocznie występuje pod nazwą GPS, w r
     Samodzielna budowa jednostki z użyciem kupionych oddzielnie komponentów oraz oprogramowania open-source daje dużo większe możliwości w przystosowaniu platformy do 
     własnych wymagań i preferencji.
         \subsection{Rama BSP}
-        Rama użyta do zbudowania jednostki to Holybro S500 v2. Oferuje wbudowaną w konstrukcję kadłuba rozdzielnicę napięcia \textit{(ang. power distribution board)} dostarczającą energię elektryczną
+        Rama użyta do zbudowania jednostki to Holybro S500 v2~\cite{web:holybro:S500:frame}. Oferuje wbudowaną w konstrukcję kadłuba rozdzielnicę napięcia (ang. \textit{power distribution board)} dostarczającą energię elektryczną
         z akumulatora do silników. Miejscem na montaż silników są cztery ramiona wykonane z nylonu poliamidowego, wzmocnione w środku poprzez dodanie prętów z włókna węglowego. Całość 
         opiera się na podwoziu z rurek z włókna węglowego połączonych plastikowymi łącznikami.
         \subsection{Napęd}
         Pojazd napędzany jest przez cztery silniki bezszczotkowe AIR2216II o mocy do 272~W każdy. Silniki bezszczotkowe wymagają zasilania prądem zmiennym trójfazowym, dlatego do ich działania 
-        potrzebne są moduły regulacji napięcia \textit{(ang. electronic speed controller)}. Moduły te zasilane są prądem stałym z akumulatora, który następnie zostaje przekształcony na prąd 
+        potrzebne są moduły regulacji napięcia (ang. \textit{electronic speed controller)}. Moduły te zasilane są prądem stałym z akumulatora, który następnie zostaje przekształcony na prąd 
         zmienny trójfazowy wywołujący obrót silników o zadanej prędkości. Prędkość jest regulowana za pomocą sygnału dochodzącego do ESC z komputera pokładowego. Moduły ESC zastosowane w zbudowanym pojeździe 
         to BLHeli S 20A. Jednostka została wyposażona w śmigła T1045II o rozpiętości 260 milimetrów i szerokości do 30 milimetrów. Specyfikacja każdego z elementów napędu została pokazana na rysunku ~\ref{rys:dok:naped}.
             \begin{figure}[H]
@@ -210,16 +210,16 @@ sztucznych satelitów na orbicie Ziemi. Potocznie występuje pod nazwą GPS, w r
         \subsection{Zewnętrzny moduł nawigacji satelitarnej}
         Zastosowany w jednostce zewnętrzny moduł GNSS to M10 od firmy Holybro. Oferuje jednoczesne otrzymywanie informacji od czterech największych 
         systemów satelit geolokacyjnych: europejskich satelit Galileo, amerykańskich GPS, rosyjskich GLONASS i chińskich Bei Dou. Oferowana dokładność wyznaczonej pozycji to 
-        2.0~m CEP, co oznacza że co najmniej 50\% pomiarów wskaże pozycję oddaloną o 2 metry lub mniej od rzeczywistej \mbox{pozycji\cite{web:holybro:m10gps}}.
+        2.0~m CEP (ang. \textit{Circular Error Probable}), co oznacza że co najmniej 50\% pomiarów wskaże pozycję oddaloną o 2 metry lub mniej od rzeczywistej \mbox{pozycji\cite{web:holybro:m10gps}}.
         \subsection{Układ komunikacji z pilotem}
         BSP został przygotowany do utrzymywania dwóch rodzajów komunikacji z pilotem. Podstawowym kanałem komunikacji jest kontroler RadioMaster TX12 MKII pozwalający na zdalne 
         sterowanie dronem wyposażonym w odbiornik radiowy RadioMaster RP4TD-M używając systemu ExpressLRS zapewniającego niezawodność i stabilność łącza nawet na dystansie 100~km\cite{web:ExpressLRS:maxdist}. 
-        Drugim kanałem komunikacji jest system telemetrii Holybro SiK Telemetry Radio V3 w wersji 433~MHz. Moduł podłączony do komputera osobistego znajdującego się na ziemi w pobliżu 
+        Drugim kanałem komunikacji jest system telemetrii Holybro SiK Telemetry Radio V3 w wersji 433~MHz~\cite{web:holybro:telemetry:modules}. Moduł podłączony do komputera osobistego znajdującego się na ziemi w pobliżu 
         pilota pozwala na użycie aplikacji Mission Planner--- oprogramowania pozwalającego między innymi na śledzenie BSP na mapie czy odczyt bieżących \mbox{danych\cite{web:ardupilot:mission:planner}}.
         \subsection{Komputer pokładowy}
-        Rolę komputera pokładowego pełni Pixhawk 6C. Wyposażony jest w dwa procesory: STM32H743 — 480MHz Cortex-M7 odpowiedzialny za działanie oprogramowania zainstalowanego na urządzeniu, 
+        Rolę komputera pokładowego pełni Pixhawk 6C~\cite{web:pixhawk6c:specs}. Wyposażony jest w dwa procesory: STM32H743 — 480MHz Cortex-M7 odpowiedzialny za działanie oprogramowania zainstalowanego na urządzeniu, 
         odczyt parametrów z sensorów, przetwarzanie informacji i przekazywanie poleceń dotyczących silników do drugiego procesora, w tym przypadku STM32F103 — 72 MHz Cortex-M3. Zadaniem 
-        drugiego procesora jest generowanie sygnałów modulacji szerokości pulsu (ang \textit{pulse-width modulation}) na podstawie otrzymanych danych i przekazywanie ich do modułów ESC. W przypadku wystąpienia problemów z pierwszym procesorem 
+        drugiego procesora jest generowanie sygnałów modulacji szerokości pulsu (ang. \textit{pulse-width modulation}) na podstawie otrzymanych danych i przekazywanie ich do modułów ESC. W przypadku wystąpienia problemów z pierwszym procesorem 
         jest w stanie samodzielnie generować sygnał sterujący silnikami, jednak przez brak dostępu do czujników takich jak żyroskopy czy akcelerometry jego możliwości ograniczają się do 
         utrzymania kręcenia się śmigieł w celu spowolnienia upadku i minimalizacji uszkodzeń przy lądowaniu awaryjnym.
 
@@ -236,7 +236,8 @@ sztucznych satelitów na orbicie Ziemi. Potocznie występuje pod nazwą GPS, w r
          o pojemności 10000~mAh, napięciu 5~V, mocy maksymalnej 22.5~W i wadze 235~g. Możliwe jest zasilenie Raspberry Pi akumulatorem drona, wiąże się to jednak z ingerencją w gotowy układ zasilania oraz  koniecznością obniżenia napięcia z 14.8~V do 5~V. Problem 
          stanowią również silniki elektryczne napędzające jednostkę, ich zużycie prądu zmienia się bardzo dynamicznie co stwarza ryzyko spadku napięcia zasilającego komputer asystujący poniżej wymaganych 5~V. W przypadku Raspberry Pi 
         spadek napięcia poniżej 4.6~3V (±5\%) może skutkować obniżoną wydajnością komputera, nieprawidłowym działaniem podłączonych urządzeń peryferyjnych lub do nieprzewidywalnego zachowania urządzenia czy uszkodzenia danych na karcie pamięci.~\cite{web:raspberry:pi:documentation:power:supply} 
-        Aby uniknąć potencjalnych problemów i ingerencji w gotowy układ zasilania zastosowane zostało oddzielne źródło prądu dla komputera asystującego.
+        Aby uniknąć potencjalnych problemów i ingerencji w gotowy układ zasilania zastosowane zostało oddzielne źródło prądu dla komputera asystującego. Inne dostępne na rynku powerbanki o parametrach pozwalających na użycie ich jako źródła zasilania dla Raspberry Pi 5 ale mniejszych pojemnościach 
+        odznaczały się niewiele mniejszą wagą, średnia różnica to około 50~g. Z uwagi na niewielką różnicę w wadze wybrano powerbank o zapasie energii pozwalającej na wielokrotnie dłuższe działanie komputera asystującego od maksymalnego czasu lotu drona.
         \subsection{Montaż komputerów}
         Kontroler lotu Pixhawk 6C ma w zestawie dwustronną taśmę samoprzylepną pozwalającą na łatwy montaż komputera. Taśma ma dodatkowo warstwę pianki pomiędzy warstwami przylepnymi w celu amortyzacji wstrząsów i 
         ochrony komputera przed uszkodzeniami mechanicznymi. Rozmiary kadłuba drona nie pozwalają na umieszczenie obu komputerów obok siebie a montaż jeden na drugim nie jest możliwe z użyciem taśmy. 
@@ -274,7 +275,7 @@ sztucznych satelitów na orbicie Ziemi. Potocznie występuje pod nazwą GPS, w r
         \]
         Jeden silnik potrzebuje około 3.42~A, co dla czterech silników daje łącznie 13.67~A. Używając akumulatora o pojemności 5000~mAh daje to teoretyczne 21.95 minut lotu. Biorąc pod uwagę dodatkowe zużycie prądu przez komputer pokładowy oraz 
         zwiększone zużycie prądu przy wznoszeniu i manewrowaniu, bezpieczniejszym będzie przyjęcie marginesu błędu i określenie czasu lotu na około 19--20 minut. Oszacowanie maksymalnego czasu działania Raspberry Pi jest dużo trudniejsze, 
-        zależy to w dużym stopniu od złożoności programów na niej uruchomionych. Opisane dalej testy wykazały że pobór mocy w stanie spoczynku wahają się między 3.177~W a 3.484~W, mediana odczytów to 3.281~W. 
+        zależy to w dużym stopniu od złożoności programów na niej uruchomionych. Opisane w podrozdziale 3.7 testy wykazały że pobór mocy w stanie spoczynku wahają się między 3.177~W a 3.484~W, mediana odczytów to 3.281~W. 
         Przy parametrach zastosowanego zasilania szacowany czas działania to 11 godzin i 15 minut.
 \chapter{Zastosowanie środowiska}
     \section{Wstępne założenia}
@@ -648,7 +649,7 @@ if __name__ == "__main__":
     \section{Dynamiczne ustawianie progu odległości}
     Poprzednie programy miały próg odległości określony w zmiennej globalnej. W tej wersji próg jest obliczany na bieżąco na podstawie prędkości drona oraz czasu potrzebnego na reakcję. 
     Zamiast jednego progu aktywacji definiowanego z góry, Program odczytuje
-prędkość drona i ustala próg dynamicznie, dla każdego czujnika oddzielnie. W tym celu wykorzystano pomiary czasu reakcji i ustalono średni czas na 1.6 s .Na podstawie tych danych obliczana jest
+prędkość drona i ustala próg dynamicznie, dla każdego czujnika oddzielnie. W tym celu wykorzystano pomiary czasu reakcji i ustalono średni czas na 1.5 s .Na podstawie tych danych obliczana jest
 odległość, z jakiej pilot będzie w stanie zareagować na zbliżającą się przeszkodę.
 \begin{lstlisting}[language=python, caption={Program ostrzegający o zbliżaniu się do przeszkody}, label={lst:program2}]
 import time
@@ -793,6 +794,131 @@ def main():
 if __name__ == "__main__":
     main()
         \end{lstlisting}
+    \section{Utrzymanie drona wewnątrz obszaru}
+        Opracowaną platformę można użyć do wyznaczenia pewnego obszaru na którym lot jest dozwolony i ostrzegania pilota w momencie przekroczenia jego granicy. W tym celu 
+        wykorzystano program~\ref{lst:program:area}. Obszar po którym możemy się poruszać definiowany jest jako wielokąt, opisany w programie jako lista wierzchołków. 
+        Wierzchołki powinny być zapisane jako para współrzędnych geograficznych wyrażonych ułamkiem dziesiętnym i zapisane w pliku JSON. Plik z wierzchołkami wyznaczającymi obszar 
+        jest przekazywany jako parametr uruchomienia programu. Po wczytaniu danych z pliku JSON i ustanowieniu połączenia z Pixhawk program w nieskończonej pętli pobiera aktualną pozycję 
+        drona z Pixhawk i sprawdza czy odczytane współrzędne znajdują się wewnątrz wielokąta. Sprawdzenie odbywa się za pomocą algorytmu rzucania promienia (ang. \textit{ray-casting algorithm})~\cite{MShimrat:Algorithm:112}. 
+        Polega on na narysowaniu półprostej wychodzącej ze sprawdzanego punktu i zliczanie przecięć z bokami wielokąta. Punkt znajduje się wewnątrz wielokąta jeżeli ilość przecięć z jego bokami jest nieparzysta. 
+        Wizualizacja algorytmu rzucania promienia została przedstawiona na rysunku~\ref{rys:ray:casting}.
+        \begin{center}
+    \includegraphics[page=1,width=0.95\textwidth,height=0.85\textheight,keepaspectratio]{ray-casting.pdf}
+    \captionof{figure}{Wizualna reprezentacja algorytmu rzucania promienia}
+    \label{rys:ray:casting}
+\end{center}
+        Implementacja tego algorytmu w programie działa w następujący sposób: na początek program przyjmuje że punkt leży poza wielokątem, zmienna \texttt{inside} ustawiana jest na \texttt{False}. Następnie w~pętli 
+        sprawdzana jest każda krawędź wielokąta w postaci pary sąsiadujących wierzchołków. W pierwszej kolejności porównywane są szerokości 
+        geograficzne wierzchołków z szerokością na której leży sprawdzany punkt i wychodzący z niego promień. Jeżeli promień leży pomiędzy dwoma wierzchołkami, program sprawdza czy odcinek między nimi znajduje się po 
+        prawej stronie sprawdzanego punktu. W przypadku spełnienia obu warunków można stwierdzić że promień przecina sprawdzany bok. Zmienna \texttt{inside} jest zmieniana na stan przeciwny. Po sprawdzeniu wszystkich boków 
+        wielokąta wartość zmiennej \texttt{inside} określa czy punkt znajduje się wewnątrz wielokąta, jeżeli końcowa wartość to \texttt{True} program wywoła wysłanie ostrzeżenia przez komputer pokładowy. 
+        Ostrzeżenie o wykroczeniu poza wyznaczony obszar jest wysyłane do pilota w sposób analogiczny do poprzednio opisanych programów.\par
+        Poprawność działania programu zależna jest od poprawności odczytów obecnej pozycji drona. Zastosowany moduł M10 oferuje dokładność na poziomie 2.0~m CEP~\cite{web:holybro:m10gps}. W tym przypadku bardziej przydatną 
+        miarą dokładności będzie R95 określające promień koła, którego środek jest faktyczną pozycją urządzenia geolokacyjnego a pole jest obszarem w którym znajdzie się 95\% pomiarów. Wartość R95 można obliczyć mnożąc wartość CEP przez 
+        2.1~\cite{web:novatel:position:accuracy:measures}, dla użytego modułu GNSS wartość R95 to 4.2~m. W przypadku gdy zastosowanie programu wymaga pewności niewykraczania poza wyznaczony obszar, wskazane jest wyznaczenie strefy 
+        z odpowiednim marginesem błędu wynoszącym co najmniej 4.2~m od faktycznych granic. Przykładowym zastosowaniem wymagającym gwarancji nieprzekroczenia granicy jest zabezpieczenie przed opuszczeniem strefy wyznaczonej przez PANSA~\cite{web:pansa:map}. 
+        W zależności od miejsca odbywania lotu może być wymagana zgoda udzielona przez wieżę kontroli lotów lub przedstawienie wcześniej planu misji. Istnieją też strefy w których loty BSP są całkowicie zakazane dla pilotów cywilnych. 
+        Odbywanie lotów bez wymaganych w danej strefie zezwoleń może nieść za sobą konsekwencje prawne, dlatego program ostrzegający przed wyjściem poza wyznaczony obszar może być użyteczny dla pilotów odbywających loty w pobliżu granic stref.
+        \begin{lstlisting}[language=python, caption={Program ostrzegający o wykroczeniu poza wyznaczony obszar}, label={lst:program:area}]
+import json
+import sys
+import time
+
+from dronekit import connect, APIException
+from pymavlink import mavutil
+
+DRONE_PORT = "/dev/serial/by-id/usb-Holybro_Pixhawk6C_450046001751333337363133-if00"
+DEFAULT_AREA_FILE = "area.json"
+ALERT_DELAY = 2.0
+NORMAL_DELAY = 0.1
+
+def load_json(file_path):
+    with open(file_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    polygon = data.get("polygon")
+
+    if not polygon or len(polygon) < 3:
+        raise ValueError("Polygon must contain at least 3 points")
+
+    return [(float(lat), float(lon)) for lat, lon in polygon]
+
+def connect_pixhawk():
+    #[...]
+
+def send_alert(vehicle, message):
+    #[...]
+
+def get_current_position(vehicle):
+    location = vehicle.location.global_frame
+
+    if location is None or location.lat is None or location.lon is None:
+        return None
+
+    return location.lat, location.lon
+
+def check_area(point, polygon):
+    lat, lon = point
+    inside = False
+
+    n = len(polygon)
+    j = n - 1
+
+    for i in range(n):
+        lat_i, lon_i = polygon[i]
+        lat_j, lon_j = polygon[j]
+
+        intersects = ((lon_i > lon) != (lon_j > lon)) and (
+            lat < (lat_j - lat_i) * (lon - lon_i) / (lon_j - lon_i + 1e-12) + lat_i
+        )
+
+        if intersects:
+            inside = not inside
+
+        j = i
+
+    return inside
+
+def main():
+    vehicle = None
+    area_file = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_AREA_FILE
+
+    try:
+        polygon = load_json(area_file)
+        print(f"Loaded polygon with {len(polygon)} points from {area_file}")
+
+        vehicle = connect_pixhawk()
+
+        send_alert(vehicle, "Companion computer connected")
+
+        while True:
+            position = get_current_position(vehicle)
+
+            if position is None:
+                continue
+
+            inside = check_area(position, polygon)
+
+            if not inside:
+                send_alert(vehicle, "outside bounds")
+                time.sleep(ALERT_DELAY)
+            else:
+                time.sleep(NORMAL_DELAY)
+
+    except KeyboardInterrupt:
+        print("\nProgram interrupted by user.")
+
+    finally:
+        print("Closing connections...")
+
+        if vehicle:
+            vehicle.close()
+            print("Drone connection closed")
+
+if __name__ == "__main__":
+    main()
+        \end{lstlisting}
+
     \section{Testy}
         W celu weryfikacji działania zbudowanego systemu wykonano szereg testów  obejmujących
         zarówno sprawdzenie działania i parametrów użytego sprzętu, jak również poprawność działania napisanych programów.
@@ -926,7 +1052,7 @@ if __name__ == "__main__":
         określony wzór znajdujący się na lądowisku, na przykład specjalny znacznik lub namalowany symbol. Po przełączeniu drona w odpowiedni tryb lotu, system mógłby obliczać 
         położenie drona względem środka znacznika i wysyłać do autopilota odpowiednie korekty ruchu. Dzięki temu dron mógłby autonomicznie ustawić się nad lądowiskiem i wylądować 
         możliwie blisko jego środka. Takie rozwiązanie byłoby przydatne zwłaszcza wtedy, gdy dron ma wracać do konkretnej stacji dokującej albo lądować w ograniczonej przestrzeni.
-
+    \subsubsection*{Ramię}
 \addcontentsline{toc}{chapter}{Bibliografia} % też ręczne dodanie do spisu treści, jak Wstęp
 \label{sec:bibliografia}
 \bibliography{MKowalBibliografia}
