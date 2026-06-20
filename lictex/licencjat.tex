@@ -153,9 +153,23 @@
     się osobną dziedziną rekreacji i rywalizacji. Inne zastosowania wynikają z możliwości zastąpienia człowieka w miejscach, gdzie wykonywanie zadania byłoby dla niego niebezpieczne, 
     trudne lub zbyt kosztowne. Roboty poszukiwawcze mogą poruszać się w jaskiniach, tunelach lub pod gruzami budynków, ograniczając ryzyko dla ratowników, a zdalnie sterowane 
     pojazdy podwodne pozwalają badać głębokości niedostępne albo niebezpieczne dla nurków. Pojazdy bezzałogowe znajdują również zastosowanie tam, gdzie ich użycie jest uzasadnione 
-    ekonomicznie --- na przykład w rolnictwie, gdzie drony mogą w wybranych zadaniach zastępować znacznie droższe w eksploatacji śmigłowce.
-
-Tu treść wstępu (który piszemy na końcu, po napisaniu całej pracy).
+    ekonomicznie --- na przykład w rolnictwie, gdzie drony mogą w wybranych zadaniach zastępować znacznie droższe w eksploatacji śmigłowce.\par
+    Niniejsza praca opisuje projekt, budowę oraz testy bezzałogowego statku powietrznego wyposażonego w komputer pokładowy Pixhawk 6C oraz komputer asystujący Raspberry Pi 5B. 
+    Głównym celem projektu było stworzenie otwartej, możliwej do rozbudowy platformy latającej, która pozwala na podłączanie dodatkowych urządzeń peryferyjnych oraz uruchamianie własnych programów 
+    wspomagających pracę drona. W pracy przedstawiono zarówno część sprzętową konstrukcji, jak i przykładowe zastosowania komputera asystującego, ze szczególnym uwzględnieniem systemu ostrzegania 
+    przed przeszkodami oraz programu kontrolującego położenie drona względem wyznaczonego obszaru lotu.\par
+    Praca rozpoczyna się przedstawieniem podstawowych zagadnień potrzebnych do zrozumienia dalszej części projektu. Omówiono ogólną ideę BSP, rolę komputera pokładowego i komputera asystującego, a także znaczenie 
+    komunikacji, telemetrii oraz systemów nawigacji satelitarnej. Rozdział ten stanowi wprowadzenie do tematyki pracy i wyjaśnia pojęcia pojawiające się w kolejnych rozdziałach.\par
+    Drugi rozdział poświęcony jest sprzętowej części zbudowanej platformy. Opisano w nim dobór i zastosowanie poszczególnych komponentów, takich jak rama, układ napędowy, moduł GNSS, system komunikacji z pilotem, 
+    komputer pokładowy oraz asystujący. Przedstawiono również sposób zasilania jednostki, montaż komputerów na ramie oraz podstawowe parametry gotowego drona, w tym masę i szacowany czas lotu. Celem tej części 
+    pracy jest pokazanie, w jaki sposób z oddzielnie dobranych podzespołów można zbudować otwartą platformę, którą da się dalej modyfikować i przystosowywać do własnych zadań.\par
+    W trzecim rozdziale opisano praktyczne wykorzystanie komputera asystującego. Przedstawiono sposób komunikacji Raspberry Pi z Pixhawk 6C, przygotowanie środowiska programistycznego oraz automatyczne 
+    uruchamianie programów po starcie systemu. Następnie opisano stworzone programy: podstawowy szablon połączenia z komputerem pokładowym, system ostrzegania przed przeszkodami z użyciem ultradźwiękowych 
+    czujników odległości, wersję uwzględniającą prędkość zbliżania się do przeszkody, program z dynamicznie wyznaczanym progiem ostrzegania oraz program sprawdzający, czy dron pozostaje wewnątrz 
+    wyznaczonego obszaru lotu. Rozdział zawiera również opis testów obejmujących poprawność działania systemu, pobór prądu, dokładność pomiarów odległości i czas reakcji, a także omówienie 
+    alternatywnych rozwiązań, które mogłyby zostać zastosowane w podobnym układzie.\par
+    Ostatni rozdział przedstawia możliwe kierunki dalszego rozwoju projektu, opisując sposoby dodania kolejnych urządzeń peryferyjnych i programów rozszerzających funkcjonalność platformy. Zaproponowane 
+    zastosowania pokazują wszechstronność zastosowań zbudowanej platformy, co było jednym z celów pracy.
 
 \chapter{Wprowadzenie do bezzałogowych statków powietrznych}
 
@@ -175,6 +189,18 @@ Komputerem asystującym w przypadku tego projektu jest Raspberry Pi 5B.
 
 Globalny System Nawigacji Satelitarnej (ang. \textit{Global Navigation Satellite System}, skrót GNSS) to system pozwalający na pozycjonowanie i znajdowanie ścieżki używając do tego 
 sztucznych satelitów na orbicie Ziemi~\cite{web:euspa:gnss}. Potocznie występuje pod nazwą GPS, w rzeczywistości jest to amerykańska sieć satelitów i jest jedną z kilku systemów składających się na GNSS.
+
+MAVLink (ang. \textit{Micro Air Vehicle Link}) to protokół komunikacyjny wykorzystywany w systemach bezzałogowych do wymiany informacji między komputerem pokładowym, komputerem asystującym, stacją naziemną oraz 
+innymi urządzeniami. Za jego pomocą przesyłane są między innymi dane telemetryczne, informacje o stanie pojazdu, komunikaty ostrzegawcze oraz polecenia sterujące. W projekcie MAVLink umożliwia komunikację 
+między Pixhawk 6C a Raspberry Pi 5B, dzięki czemu komputer asystujący może odczytywać dane z drona i wysyłać komunikaty do pilota.
+
+Telemetria oznacza zdalne przesyłanie danych pomiarowych i informacji o stanie urządzenia. W przypadku bezzałogowego statku powietrznego obejmuje ona między innymi pozycję, wysokość, prędkość, orientację, 
+stan połączenia, napięcie zasilania oraz komunikaty generowane przez system. Dzięki telemetrii pilot może obserwować aktualny stan drona na komputerze lub stacji naziemnej, a także szybciej reagować 
+na problemy pojawiające się podczas lotu.
+
+IMU (ang. \textit{Inertial Measurement Unit}) to inercyjna jednostka pomiarowa służąca do określania ruchu i orientacji pojazdu. Zazwyczaj składa się z akcelerometrów mierzących przyspieszenia oraz 
+żyroskopów mierzących prędkość obrotową wokół osi. W bezzałogowych statkach powietrznych dane z IMU są wykorzystywane przez komputer pokładowy do stabilizacji lotu, wykrywania przechylenia 
+oraz utrzymywania zadanej orientacji drona.
 \section{Zadania i ograniczenia komputera pokładowego}
         Rolą każdego komputera pokładowego jest przede wszystkim sterowanie silnikami pojazdu którego jest częścią. Komputer pokładowy musi więc posiadać odpowiednie 
         interfejsy do komunikacji z silnikami oraz interfejs do otrzymywania poleceń. W przypadku komputerów pokładowych używanych w BSP wielowirnikowych niezbędny jest również żyroskop, 
@@ -233,7 +259,7 @@ sztucznych satelitów na orbicie Ziemi~\cite{web:euspa:gnss}. Potocznie występu
         jest w stanie samodzielnie generować sygnał sterujący silnikami, jednak przez brak dostępu do czujników takich jak żyroskopy czy akcelerometry jego możliwości ograniczają się do 
         utrzymania kręcenia się śmigieł w celu spowolnienia upadku i minimalizacji uszkodzeń przy lądowaniu awaryjnym.
 
-        Do poprawnego sterowania pojazdem wymagane są również odpowiednie czujniki. Pixhawk 6C posiada dwa urządzenia łączące w sobie akcelerometry i żyroskopy: ICM-42688-P i BMI055. 
+        Do poprawnego sterowania pojazdem wymagane są również odpowiednie czujniki. Pixhawk 6C posiada dwa urządzenia IMU: ICM-42688-P i BMI055. 
         Użycie dwóch urządzeń i porównanie ich odczytów ze sobą pozwala na wykrycie niedokładności lub uszkodzenia jednego z nich i zapobiega destabilizacji drona w przypadku awarii. 
         W razie uszkodzenia komputer pokładowy może wdrożyć procedurę bezpieczeństwa i bezpiecznie ją wykonać polegając na pozostałym działającym czujniku. Pixhawk 6C wyposażony jest również w 
         magnetometr IST8310 pozwalający na określenie jego pozycji na podstawie pola magnetycznego Ziemi oraz barometr MS5611 pozwalający obliczyć wysokość nad ziemią na podstawie różnicy \mbox{ciśnień\cite{web:pixhawk6c:specs}}.
@@ -1074,6 +1100,67 @@ if __name__ == "__main__":
         pobliskie przedmioty. można wykorzystać je do podnoszenia obiektów znajdujących się w trudno dostępnych miejscach lub dostarczania przedmiotów na odległość. Możliwe jest też zbudowanie ramienia 
         zawieszonego na zwijanej linie, z możliwością spuszczenia go. Tak wyposażona jednostka może być użyta jako dron ,,ratunkowy'' używany do chwytania i sprowadzania dronów które utknęły w trudno dostępnych miejscach, 
         na przykład skutkiem rozładowania baterii lub przypadkowym wleceniu w drzewo. Dla wygodniejszego sterowania ramię może być wyposażone w kamerę.
+\chapter*{Podsumowanie}
+\addcontentsline{toc}{chapter}{Podsumowanie} % ...ale w spisie treści ma być...
+\chaptermark{Podsumowanie} % ...i w paginie górnej
+    Celem pracy było zaprojektowanie, zbudowanie i przetestowanie bezzałogowego statku powietrznego wyposażonego w komputer pokładowy oraz komputer asystujący. Założeniem projektu 
+    było opracowanie drona, którego można rozwijać, modyfikować i wykorzystywać 
+    do różnych zastosowań. W tym celu zbudowano statek powietrzny oparty na kontrolerze lotu Pixhawk 6C oraz mikrokomputerze Raspberry Pi 5B. Takie połączenie stworzyło platformę 
+    dającą możliwość użycia własnoręcznie zaprojektywanych i wykonanych urządzeń peryferyjnych oraz pisanie programów.\par
+    W pracy przedstawiono podstawowe zagadnienia związane z bezzałogowymi statkami powietrznymi, ich budową oraz sposobem sterowania. Omówiono rolę komputera pokładowego, który 
+    odpowiada za stabilizację, obsługę czujników i sterowanie silnikami, a także rolę komputera asystującego, rozszerzającego możliwości pojazdu. Wyjaśniono również znaczenie 
+    pojęć kluczowych dla zrozumienia dalszej części projektu. Dzięki temu praca nie ogranicza się jedynie do opisu gotowego rozwiązania, ale pokazuje również, z jakich elementów 
+    składa się współczesny system BSP i jak poszczególne części współpracują ze sobą.\par
+    W części sprzętowej opisano dobór komponentów wykorzystanych do budowy platformy. Konstrukcja została oparta na ramie Holybro S500 v2, czterech silnikach bezszczotkowych 
+    AIR2216II, regulatorach BLHeli S 20A i śmigłach T1045II. Zastosowano również moduł GNSS Holybro M10, system komunikacji z pilotem oparty o aparaturę RadioMaster oraz system 
+    telemetrii Holybro SiK Telemetry Radio. Rolę komputera pokładowego pełnił Pixhawk 6C z oprogramowaniem ArduCopter, natomiast za obsługę dodatkowych programów odpowiadał 
+    Raspberry Pi 5B. Komputer asystujący i pozostałe części drona wymagające zasilania otrzymały osobne, niezależne od siebie źródła prądu. Takie rozwiązanie ograniczyło 
+    ryzyko problemów wynikających ze spadków napięcia w głównym układzie zasilania drona. Zaprojektowano własne elementy montażowe i wykonano je za pomocą druku 3D. Umożliwiło to 
+    stabilne zamocowanie komputerów oraz zachowanie dostępu do chłodzenia Raspberry Pi i pinów GPIO. Własne elementy montażowe zastosowano również przy budowie systemu 
+    czujników odległości. Projekt wymagał nie tylko pracy programistycznej, ale także praktycznego rozwiązania problemów konstrukcyjnych, elektrycznych i montażowych.
+    Na podstawie masy jednostki oraz dokumentacji napędu oszacowano możliwy czas lotu na około 19–20 minut. Oszacowano również czas pracy Raspberry Pi z osobnym źródłem zasilania, 
+    który okazał się wielokrotnie dłuższy od czasu lotu drona. Wybrane zasilanie komputera asystującego nie stanowi ograniczenia dla pojedynczego lotu.\par
+    W dalszej części pracy przygotowano środowisko programistyczne na Raspberry Pi. Fizyczne połączenie z Pixhawk 6C zostało zrealizowane przez USB, natomiast komunikacja między 
+    komputerami była możliwa dzięki użytym w programach bibliotekom DroneKit i PyMAVLink. 
+    Opracowano szablon programu, który nawiązuje połączenie z komputerem pokładowym, oczekuje na sygnał heartbeat, wysyła komunikat do pilota oraz poprawnie zamyka połączenie 
+    po zakończeniu działania programu. Szablon może zostać wykorzystany do opracowania własnych programów i był podstawą dla następnych kroków rozwoju projektu. 
+    Przygotowano także usługę systemd, dzięki której wybrany program może uruchamiać się automatycznie po starcie Raspberry Pi. 
+    Jest to szczególnie ważne w zastosowaniach terenowych, ponieważ podczas lotu nie zakłada się korzystania z monitora, klawiatury ani ręcznego uruchamiania skryptów.\par
+    Jako praktyczny przykład wykorzystania komputera asystującego zbudowano system ostrzegania przed przeszkodami. Do tego celu użyto trzech ultradźwiękowych czujników odległości 
+    HC-SR04. Czujniki zostały rozmieszczone z przodu platformy i zamontowane na zaprojektowanych i wydrukowanych na drukarce 3D uchwytach. Ze względu na różnicę poziomów napięć 
+    między czujnikami a wejściami Raspberry Pi zastosowano konwerter poziomów logicznych, który obniża sygnał ECHO do bezpiecznego poziomu. Zbudowany układ pozwolił na praktyczne 
+    przetestowanie możliwości podłączania własnych urządzeń peryferyjnych do komputera asystującego.
+    Pierwszy program ostrzegający przed przeszkodami działał na podstawie stałego progu odległości. Raspberry Pi wykonywało pomiary za pomocą kolejnych czujników, porównywało odczyty 
+    z ustalonym progiem i po wykryciu przeszkody wysyłało ostrzeżenie do pilota przez komputer pokładowy. W kolejnej wersji programu dodano warunek związany z prędkością drona. 
+    System pobierał z Pixhawk informację o prędkości oraz orientacji pojazdu, a następnie obliczał prędkość zbliżania się do przeszkody dla każdego czujnika. 
+    Dzięki temu ostrzeżenie było wysyłane tylko wtedy, gdy przeszkoda znajdowała się blisko drona i jednocześnie pojazd poruszał się w jej kierunku.
+    Następnie opracowano wersję programu z dynamicznie wyznaczanym progiem odległości. W tym przypadku próg ostrzegania zależał od prędkości zbliżania się do przeszkody 
+    oraz przyjętego czasu reakcji. Takie rozwiązanie jest bardziej elastyczne, ponieważ wraz ze wzrostem prędkości drona rośnie również odległość potrzebna na reakcję pilota. 
+    Program zapisywał także dane do pliku, co umożliwiało późniejszą analizę odczytów z czujników, prędkości oraz obliczonych progów.
+    Kolejnym programem było rozwiązanie sprawdzające, czy dron pozostaje wewnątrz wyznaczonego obszaru lotu. Dozwolony obszar miał postać wielokąta, którego wierzchołki przechowywane były 
+    jako współrzędne geograficzne w pliku JSON. Program odczytywał aktualną pozycję drona z Pixhawk, a następnie sprawdzał, czy znajduje się ona wewnątrz wielokąta. Do tego celu 
+    zastosowano algorytm rzucania promienia. Po wykryciu opuszczenia wyznaczonej strefy program wysyłał ostrzeżenie do pilota. Wskazano potrzebę zachowania marginesu bezpieczeństwa 
+    wynikającego z błędu pozycjonowania.\par
+    Wykonane testy pozwoliły sprawdzić poprawność działania sprzętu i oprogramowania. Czujniki odległości przetestowano przy przeszkodach ustawionych w różnych odległościach i pod 
+    różnymi kątami. W przypadku przeszkody ustawionej prostopadle do czujnika odczyty były poprawne do około 460 cm. Testy wykazały również, że skuteczność czujników ultradźwiękowych 
+    zależy od kąta ustawienia przeszkody. Przy większych odległościach nawet niewielkie odchylenie powierzchni od położenia prostopadłego mogło prowadzić do błędnych odczytów. 
+    Jest to ważne ograniczenie zastosowanego rozwiązania, w rzeczywistych warunkach przeszkody mogą być ustawione pod różnymi kątami i przybierać różne kształty.
+    Sprawdzono pobór mocy Raspberry Pi podczas działania programu. Pomiary wykazały, że zużycie energii komputera asystującego jest na tyle niskie, że zastosowany powerbank pozwala na 
+    znacznie dłuższą pracę niż maksymalny czas lotu drona. Oznacza to, że ograniczeniem czasu działania całego systemu pozostaje przede wszystkim akumulator zasilający napęd. Przeprowadzono 
+    także pomiary czasu reakcji systemu ostrzegania. Testy obejmowały wariant uruchamiany ręcznie i wariant z losowym opóźnieniem, który pozwalał uwzględnić reakcję człowieka. Na podstawie wyników 
+    przyjęto, że przy maksymalnym zasięgu czujników równym 4,5 m i czasie reakcji około 1,5 s system może skutecznie ostrzegać pilota przy prędkości lotu nieprzekraczającej około 3 m/s.
+    W pracy omówiono również alternatywne rozwiązania, które można było zastosować w projekcie. Zaproponowano inne rozwiązania problemu różnicy napięć dla stanów wysokich czujników oraz pinów GPIO. 
+    Przeanalizowano także możliwość zastąpienia czujników ultradźwiękowych czujnikami laserowymi, które mogłyby zapewnić szybsze pomiary i inne właściwości pracy.\par
+    Ostatni rozdział pracy wskazuje możliwe kierunki dalszego rozwoju platformy. Zaproponowano między innymi wielokierunkowy monitoring z użyciem kamer, analizę obrazu przez sieć neuronową, 
+    mapowanie terenu, wykorzystanie drona jako mobilnej stacji pomiarowej, autonomiczne lądowanie oraz zastosowanie mechanicznego ramienia. Każdy z tych pomysłów wymagałby dodania kolejnych 
+    urządzeń peryferyjnych lub przygotowania nowych programów, jednak wszystkie wykorzystują tę samą podstawową ideę: Raspberry Pi działa jako komputer asystujący i pozwala na zbudowanie statku powietrznego 
+    dostosowanego do naszych wymagań. Duża liczba możliwych zastosowań potwierdza sens budowy własnej, otwartej platformy zamiast innych, dostępnych na rynku fabrycznie zintegrowanych platform których modyfikacja 
+    jest znacznie utrudniona.\par
+    Podsumowując, w ramach pracy udało się zbudować działającą platformę BSP oraz pokazać praktyczne sposoby wykorzystania komputera asystującego. Opracowane programy komunikują się z komputerem pokładowym, 
+    pobierają dane telemetryczne, obsługują dodatkowe czujniki i wysyłają ostrzeżenia do pilota. Testy potwierdziły, że system działa zgodnie z założeniami, chociaż ujawniły także ograniczenia wynikające z 
+    użycia czujników ultradźwiękowych i dokładności pozycjonowania GNSS. Zbudowana jednostka może więc pełnić funkcję bazy do dalszych prac nad systemami. Dzięki temu dron przestaje być jedynie gotowym urządzeniem 
+    latającym, a staje się otwartą platformą, którą można rozwijać zgodnie z potrzebami użytkownika. Osiągnięte wyniki potwierdzają, że budowa takiej platformy ma praktyczny sens i może stanowić punkt 
+    wyjścia do kolejnych projektów wspomagania pilota, wykrywania przeszkód, kontroli obszaru lotu oraz innych zastosowań badawczych i użytkowych.
 \addcontentsline{toc}{chapter}{Bibliografia} % też ręczne dodanie do spisu treści, jak Wstęp
 \label{sec:bibliografia}
 \bibliography{MKowalBibliografia}
