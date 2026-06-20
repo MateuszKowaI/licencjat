@@ -144,6 +144,16 @@
 \chapter*{Wstęp}
 \addcontentsline{toc}{chapter}{Wstęp} % ...ale w spisie treści ma być...
 \chaptermark{Wstęp} % ...i w paginie górnej
+    Pojazdy bezzałogowe to urządzenia zdolne do wykonywania zadań bez obecności człowieka na pokładzie, sterowane zdalnie, półautonomicznie lub autonomicznie. Idea zdalnego 
+    kierowania pojazdem nie jest nowa --- pierwszym pojazdem była łódź sterowana zdalnie za pomocą fal radiowych. Za jej budowę odpowiedzialny był Nikola Tesla, który w 1898 roku 
+    otrzymał patent nr US613809A zatytułowany ,,\textit{Method of and apparatus for controlling mechanism of moving vessels or vehicles}''. 
+    Obecnie tego typu systemy znajdują zastosowanie zarówno w powietrzu, na lądzie, jak i na wodzie, a dzięki rozwojowi elektroniki, łączności, systemów nawigacji satelitarnej 
+    i~algorytmów autonomicznych ich rola stale rośnie. Współcześnie drony oraz inne platformy bezzałogowe to ogromny dział inżynierii znajdujący zastosowanie w wielu różnych dziedzinach. 
+    Część zastosowań pojazdów bezzałogowych powstała wraz z rozwojem samej technologii. Przykładami mogą być wykonywanie zdjęć i nagrań z powietrza czy wyścigi dronów, które stały 
+    się osobną dziedziną rekreacji i rywalizacji. Inne zastosowania wynikają z możliwości zastąpienia człowieka w miejscach, gdzie wykonywanie zadania byłoby dla niego niebezpieczne, 
+    trudne lub zbyt kosztowne. Roboty poszukiwawcze mogą poruszać się w jaskiniach, tunelach lub pod gruzami budynków, ograniczając ryzyko dla ratowników, a zdalnie sterowane 
+    pojazdy podwodne pozwalają badać głębokości niedostępne albo niebezpieczne dla nurków. Pojazdy bezzałogowe znajdują również zastosowanie tam, gdzie ich użycie jest uzasadnione 
+    ekonomicznie --- na przykład w rolnictwie, gdzie drony mogą w wybranych zadaniach zastępować znacznie droższe w eksploatacji śmigłowce.
 
 Tu treść wstępu (który piszemy na końcu, po napisaniu całej pracy).
 
@@ -383,7 +393,8 @@ WantedBy=multi-user.target
         jednak stan wysoki dla pinów w Raspberry Pi to 3.3~V. Aby zapobiec uszkodzeniom należy obniżyć napięcie wychodzące z czujnika do bezpiecznych 3.3~V, co zostało osiągnięte z użyciem 
         konwertera poziomów logicznych. Podobnie jak w przypadku komputerów, montaże konwertera stanów logicznych i czujników zostały zaprojektowane i wydrukowane w 3D. Każdy z trzech czujników został zamontowany za 
         pomocą pionowych uchwytów widocznych na rysunku \ref{rys:uchwyt:czujnik}, które zostały przykręcone do platformy pokazanej na rysunku \ref{rys:rama:czujniki}. Platforma ma również miejsce na zamocowanie 
-        konwertera stanów logicznych. Całość została podwieszona z użyciem opasek zaciskowych na dwóch rurkach z włókna węglowego będących częścią kadłuba drona.
+        konwertera stanów logicznych. Całość została podwieszona z użyciem opasek zaciskowych na dwóch rurkach z włókna węglowego będących częścią kadłuba drona. Zdjęcia gotowej jednostki zbudowanej z użyciem opracowanych 
+        elementów montażowych, z zamontowanymi i połączonymi czujnikami odległości, zostały przedstawione na rysunku \ref{rys:dron:photos}.
         \begin{figure}[H]
             \begin{center}
                 \includegraphics[width=11cm]{rama_czujniki.png}
@@ -396,6 +407,11 @@ WantedBy=multi-user.target
             \end{center}
             \caption{Uchwyt na jeden czujnik ultradźwiękowy\label{rys:uchwyt:czujnik}}
             \end{figure}
+        \begin{center}
+            \includegraphics[page=1,width=0.95\textwidth,height=0.85\textheight,keepaspectratio]{photos.pdf}
+            \captionof{figure}{Zdjęcia zbudowanej jednostki z zamontowanymi czujnikami odległości}
+            \label{rys:dron:photos}
+        \end{center}
     \section{Program wykrywający przeszkody}
         Po zbudowaniu poprawnie działającego systemu czujników odległości opracowano program\ref{lst:program1} wykorzystujący je do ostrzegania pilota przed przeszkodami znajdującymi się przed dronem. 
         Na początku programu znajdują się zmienne globalne pozwalające na łatwą zmianę kluczowych parametrów, takich jak odległość na której system powinien zareagować lub maksymalną 
@@ -814,7 +830,7 @@ if __name__ == "__main__":
         wielokąta wartość zmiennej \texttt{inside} określa czy punkt znajduje się wewnątrz wielokąta, jeżeli końcowa wartość to \texttt{True} program wywoła wysłanie ostrzeżenia przez komputer pokładowy. 
         Ostrzeżenie o wykroczeniu poza wyznaczony obszar jest wysyłane do pilota w sposób analogiczny do poprzednio opisanych programów.\par
         Poprawność działania programu zależna jest od poprawności odczytów obecnej pozycji drona. Zastosowany moduł M10 oferuje dokładność na poziomie 2.0~m CEP~\cite{web:holybro:m10gps}. W tym przypadku bardziej przydatną 
-        miarą dokładności będzie R95 określające promień koła, którego środek jest faktyczną pozycją urządzenia geolokacyjnego a pole jest obszarem w którym znajdzie się 95\% pomiarów. Wartość R95 można obliczyć mnożąc wartość CEP przez 
+        miarą dokładności będzie R95 określające promień koła, którego środek jest faktyczną pozycją urządzenia geolokacyjnego, a pole jest obszarem w którym znajdzie się 95\% pomiarów. Wartość R95 można obliczyć mnożąc wartość CEP przez 
         2.1~\cite{web:novatel:position:accuracy:measures}, dla użytego modułu GNSS wartość R95 to 4.2~m. W przypadku gdy zastosowanie programu wymaga pewności niewykraczania poza wyznaczony obszar, wskazane jest wyznaczenie strefy 
         z odpowiednim marginesem błędu wynoszącym co najmniej 4.2~m od faktycznych granic. Przykładowym zastosowaniem wymagającym gwarancji nieprzekroczenia granicy jest zabezpieczenie przed opuszczeniem strefy wyznaczonej przez PANSA~\cite{web:pansa:map}. 
         W zależności od miejsca odbywania lotu może być wymagana zgoda udzielona przez wieżę kontroli lotów lub przedstawienie wcześniej planu misji. Istnieją też strefy w których loty BSP są całkowicie zakazane dla pilotów cywilnych. 
@@ -949,10 +965,11 @@ if __name__ == "__main__":
 \end{itemize}
         \subsection{Czas reakcji systemu}
         Przy wykrywaniu przeszkód przed poruszającym się pojazdem kluczowe jest odpowiednio niskie opóźnienie, tak aby osoba kierująca miała wystarczający  
-        czas na reakcję. W celu pomiaru opóźnień wykorzystano odpowiednio zmodyfikowany program~\ref{lst:colPrevention}. Na potrzeby pomiaru zmieniono warunki 
+        czas na reakcję. W celu pomiaru opóźnień wykorzystano odpowiednio zmodyfikowany program~\ref{lst:program1}. Pomiar czasu zakłada najgorszy możliwy scenariusz: 
+        przeszkoda ma pojawić się po stronie trzeciego czujnika, zanim system będzie w stanie ją wykryć musi najpierw wykonać pomiary na pierwszym i drugim czujniku. 
+        Aby to osiągnąć zmieniono warunki 
         aktywacji systemu tak, aby pomiary pierwszego i drugiego czujnika nie spełniały warunków potrzebnych do wysłania powiadomienia. Warunek dla trzeciego czujnika 
-        został zmodyfikowany tak by był on spełniany za każdym razem. Dzięki takim ustawieniom pomiary wykonywane były przy założeniu najbardziej pesymistycznego 
-        scenariusza, gdzie przeszkoda pojawia się w idealnym momencie by wymagała przejścia przez pozostałe czujniki zanim zostanie wykryta. Program rozpoczynał 
+        został zmodyfikowany tak by był on spełniany za każdym razem. Program rozpoczynał 
         pomiar czasu po ustanowieniu połączenia z komputerem pokładowym i przed rozpoczęciem pomiarów odległości. W pierwszej wersji programu pomiar rozpoczynany 
         był ręcznie poprzez naciśnięcie klawisza. Klawisz był następnie naciskany ponownie w momencie usłyszenia ostrzeżenia odczytanego przez komputer z aplikacją 
         Mission Planner połączoną z dronem, co kończyło pomiar i zapisywało czas. W drugiej wersji programu ręczne uruchamianie pomiaru zostało zastąpione uruchamianiem 
@@ -1011,7 +1028,7 @@ if __name__ == "__main__":
         wpływ na dopuszczalny kąt pomiaru. Wraz ze skracaniem dystansu można pozwolić sobie na coraz większy kąt i zachowanie niezawodności czujnika. Alternatywą dla czujników ultradźwiękowych mogą być moduły oparte o 
         lasery podczerwone. Ponieważ wiązka lasera porusza się z prędkością światła, znacznie szybciej niż prędkość fali dźwiękowej, pomiary laserem są o wiele szybsze od tych wykonywanych przez czujnik ultradźwiękowy. 
         Używanie wielu czujników laserowych nie wiąże się też z ryzykiem zaburzania odczytów przez siebie nawzajem, co w praktyce eliminuje potrzebę ustawiania opóźnień między pomiarami. Z drugiej strony użycie lasera sprawia że 
-        obiekty szklane lub zbyt odbijające światło (np. lustro) mogą nie zostać poprawnie wykryte. Czujniki wykorzystujące laser podczerwony są też zazwyczaj droższe niż czujniki ultradźwiękowe. Zastosowanie czujników HC-SR04 motywowane było głównie ich niską 
+        obiekty nierozpraszające światła (np. obiekty szklane lub o lustrzanej powierzchni) mogą nie zostać poprawnie wykryte. Czujniki wykorzystujące laser podczerwony są też zazwyczaj droższe niż czujniki ultradźwiękowe. Zastosowanie czujników HC-SR04 motywowane było głównie ich niską 
         ceną oraz dostępnością, jednak wymienione wcześniej zalety czujników laserowych czynią z nich wartą przemyślenia alternatywę.
 
 \chapter{Potencjalne ścieżki rozwoju projektu}
@@ -1052,7 +1069,11 @@ if __name__ == "__main__":
         określony wzór znajdujący się na lądowisku, na przykład specjalny znacznik lub namalowany symbol. Po przełączeniu drona w odpowiedni tryb lotu, system mógłby obliczać 
         położenie drona względem środka znacznika i wysyłać do autopilota odpowiednie korekty ruchu. Dzięki temu dron mógłby autonomicznie ustawić się nad lądowiskiem i wylądować 
         możliwie blisko jego środka. Takie rozwiązanie byłoby przydatne zwłaszcza wtedy, gdy dron ma wracać do konkretnej stacji dokującej albo lądować w ograniczonej przestrzeni.
-    \subsubsection*{Ramię}
+    \subsubsection*{Mechaniczne ramię}
+        Dostępność pinów GPIO w Raspberry Pi pozwala na samodzielne projektowanie urządzeń peryferyjnych. Użycie silników serwo pozwala na zbudowanie ramienia potrafiącego wyginać się i chwytać 
+        pobliskie przedmioty. można wykorzystać je do podnoszenia obiektów znajdujących się w trudno dostępnych miejscach lub dostarczania przedmiotów na odległość. Możliwe jest też zbudowanie ramienia 
+        zawieszonego na zwijanej linie, z możliwością spuszczenia go. Tak wyposażona jednostka może być użyta jako dron ,,ratunkowy'' używany do chwytania i sprowadzania dronów które utknęły w trudno dostępnych miejscach, 
+        na przykład skutkiem rozładowania baterii lub przypadkowym wleceniu w drzewo. Dla wygodniejszego sterowania ramię może być wyposażone w kamerę.
 \addcontentsline{toc}{chapter}{Bibliografia} % też ręczne dodanie do spisu treści, jak Wstęp
 \label{sec:bibliografia}
 \bibliography{MKowalBibliografia}
