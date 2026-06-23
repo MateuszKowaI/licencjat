@@ -223,13 +223,12 @@ oraz utrzymywania zadanej orientacji drona.
     \label{rys:diag:dron}
 \end{center}
 \chapter{Elementy sprzętowe BSP}
-    % zdjęcie gotowego drona po zrobieniu obudowy
 \section{Lista komponentów i ich specyfikacja}
-    Większość gotowych bezzałogowych pojazdów dostępnych na rynku to zamknięte systemy a ingerencje i modyfikacje są bardzo utrudnione, zarówno sprzętowo jak i w oprogramowaniu. 
+    Większość gotowych bezzałogowych pojazdów dostępnych na rynku to zamknięte systemy, a ingerencje i modyfikacje są bardzo utrudnione, zarówno sprzętowo jak i w oprogramowaniu. 
     Samodzielna budowa jednostki z użyciem kupionych oddzielnie komponentów oraz oprogramowania open-source daje dużo większe możliwości w przystosowaniu platformy do 
     własnych wymagań i preferencji.
         \subsection{Rama BSP}
-        Rama użyta do zbudowania jednostki to Holybro S500 v2~\cite{web:holybro:S500:frame}. Oferuje wbudowaną w konstrukcję kadłuba rozdzielnicę napięcia (ang. \textit{power distribution board)} dostarczającą energię elektryczną
+        Rama użyta do zbudowania jednostki to HolyBro S500 v2~\cite{web:holybro:S500:frame}. Oferuje wbudowaną w konstrukcję kadłuba rozdzielnicę napięcia (ang. \textit{power distribution board)} dostarczającą energię elektryczną
         z akumulatora do silników. Miejscem na montaż silników są cztery ramiona wykonane z nylonu poliamidowego, wzmocnione w środku poprzez dodanie prętów z włókna węglowego. Całość 
         opiera się na podwoziu z rurek z włókna węglowego połączonych plastikowymi łącznikami.
         \subsection{Napęd}
@@ -244,13 +243,13 @@ oraz utrzymywania zadanej orientacji drona.
             \caption{Dokumentacja techniczna AIR2216II, BLHeli S 20A, T1045II. \mbox{Źródło:\cite{web:holybro:naped:dok}}\label{rys:dok:naped}}
             \end{figure}
         \subsection{Zewnętrzny moduł nawigacji satelitarnej}
-        Zastosowany w jednostce zewnętrzny moduł GNSS to M10 od firmy Holybro. Oferuje jednoczesne otrzymywanie informacji od czterech największych 
+        Zastosowany w jednostce zewnętrzny moduł GNSS to M10 od firmy HolyBro. Oferuje jednoczesne otrzymywanie informacji od czterech największych 
         systemów satelit geolokacyjnych: europejskich satelit Galileo, amerykańskich GPS, rosyjskich GLONASS i chińskich Bei Dou. Oferowana dokładność wyznaczonej pozycji to 
         2.0~m CEP (ang. \textit{Circular Error Probable}), co oznacza że co najmniej 50\% pomiarów wskaże pozycję oddaloną o 2 metry lub mniej od rzeczywistej \mbox{pozycji\cite{web:holybro:m10gps}}.
         \subsection{Układ komunikacji z pilotem}
         BSP został przygotowany do utrzymywania dwóch rodzajów komunikacji z pilotem. Podstawowym kanałem komunikacji jest kontroler RadioMaster TX12 MKII pozwalający na zdalne 
         sterowanie dronem wyposażonym w odbiornik radiowy RadioMaster RP4TD-M używając systemu ExpressLRS zapewniającego niezawodność i stabilność łącza nawet na dystansie 100~km\cite{web:ExpressLRS:maxdist}. 
-        Drugim kanałem komunikacji jest system telemetrii Holybro SiK Telemetry Radio V3 w wersji 433~MHz~\cite{web:holybro:telemetry:modules}. Moduł podłączony do komputera osobistego znajdującego się na ziemi w pobliżu 
+        Drugim kanałem komunikacji jest system telemetrii HolyBro SiK Telemetry Radio V3 w wersji 433~MHz~\cite{web:holybro:telemetry:modules}. Moduł podłączony do komputera osobistego znajdującego się na ziemi w pobliżu 
         pilota pozwala na użycie aplikacji Mission Planner--- oprogramowania pozwalającego między innymi na śledzenie BSP na mapie czy odczyt bieżących \mbox{danych\cite{web:ardupilot:mission:planner}}.
         \subsection{Komputer pokładowy}
         Rolę komputera pokładowego pełni Pixhawk 6C~\cite{web:pixhawk6c:specs}. Wyposażony jest w dwa procesory: STM32H743 — 480MHz Cortex-M7 odpowiedzialny za działanie oprogramowania zainstalowanego na urządzeniu, 
@@ -261,7 +260,7 @@ oraz utrzymywania zadanej orientacji drona.
 
         Do poprawnego sterowania pojazdem wymagane są również odpowiednie czujniki. Pixhawk 6C posiada dwa urządzenia IMU: ICM-42688-P i BMI055. 
         Użycie dwóch urządzeń i porównanie ich odczytów ze sobą pozwala na wykrycie niedokładności lub uszkodzenia jednego z nich i zapobiega destabilizacji drona w przypadku awarii. 
-        W razie uszkodzenia komputer pokładowy może wdrożyć procedurę bezpieczeństwa i bezpiecznie ją wykonać polegając na pozostałym działającym czujniku. Pixhawk 6C wyposażony jest również w 
+        W razie uszkodzenia komputer pokładowy może wdrożyć procedurę bezpieczeństwa i bezpiecznie ją wykonać, polegając na pozostałym działającym czujniku. Pixhawk 6C wyposażony jest również w 
         magnetometr IST8310 pozwalający na określenie jego pozycji na podstawie pola magnetycznego Ziemi oraz barometr MS5611 pozwalający obliczyć wysokość nad ziemią na podstawie różnicy \mbox{ciśnień\cite{web:pixhawk6c:specs}}.
         Oprogramowaniem działającym na komputerze pokładowym jest ArduCopter w wersji 4.6.2.
         \subsection{Komputer asystujący}
@@ -269,14 +268,14 @@ oraz utrzymywania zadanej orientacji drona.
         peryferyjnych, np. cztery gniazda USB czy 40 pinów GPIO. Zainstalowany na nim system operacyjny to Raspberry Pi OS będący portem Debiana Trixie.
         \subsection{Źródło zasilania}
         BSP zasilany jest za pomocą akumulatora litowo-jonowego Gens Ace G-Tech o pojemności 5000~mAh, napięciu 14.8~V i wadze 439~g. Za zasilanie komputera asystującego odpowiedzialny jest powerbank z baterią litowo-polimerową
-         o pojemności 10000~mAh, napięciu 5~V, mocy maksymalnej 22.5~W i wadze 235~g. Możliwe jest zasilenie Raspberry Pi akumulatorem drona, wiąże się to jednak z ingerencją w gotowy układ zasilania oraz  koniecznością obniżenia napięcia z 14.8~V do 5~V. Problem 
+         o pojemności 10000~mAh, napięciu 5~V, mocy maksymalnej 22.5~W i wadze 235~g. Możliwe jest zasilenie Raspberry Pi akumulatorem drona, wiąże się to jednak z ingerencją w gotowy układ zasilania oraz koniecznością obniżenia napięcia z 14.8~V do 5~V. Problem 
          stanowią również silniki elektryczne napędzające jednostkę, ich zużycie prądu zmienia się bardzo dynamicznie co stwarza ryzyko spadku napięcia zasilającego komputer asystujący poniżej wymaganych 5~V. W przypadku Raspberry Pi 
         spadek napięcia poniżej 4.6~3V (±5\%) może skutkować obniżoną wydajnością komputera, nieprawidłowym działaniem podłączonych urządzeń peryferyjnych lub do nieprzewidywalnego zachowania urządzenia czy uszkodzenia danych na karcie pamięci.~\cite{web:raspberry:pi:documentation:power:supply} 
         Aby uniknąć potencjalnych problemów i ingerencji w gotowy układ zasilania zastosowane zostało oddzielne źródło prądu dla komputera asystującego. Inne dostępne na rynku powerbanki o parametrach pozwalających na użycie ich jako źródła zasilania dla Raspberry Pi 5 ale mniejszych pojemnościach 
         odznaczały się niewiele mniejszą wagą, średnia różnica to około 50~g. Z uwagi na niewielką różnicę w wadze wybrano powerbank o zapasie energii pozwalającej na wielokrotnie dłuższe działanie komputera asystującego od maksymalnego czasu lotu drona.
         \subsection{Montaż komputerów}
         Kontroler lotu Pixhawk 6C ma w zestawie dwustronną taśmę samoprzylepną pozwalającą na łatwy montaż komputera. Taśma ma dodatkowo warstwę pianki pomiędzy warstwami przylepnymi w celu amortyzacji wstrząsów i 
-        ochrony komputera przed uszkodzeniami mechanicznymi. Rozmiary kadłuba drona nie pozwalają na umieszczenie obu komputerów obok siebie a montaż jeden na drugim nie jest możliwe z użyciem taśmy. 
+        ochrony komputera przed uszkodzeniami mechanicznymi. Rozmiary kadłuba drona nie pozwalają na umieszczenie obu komputerów obok siebie, a montaż jeden na drugim nie jest możliwe z użyciem taśmy. 
         Z tego powodu zastąpiono ją elementami zaprojektowanymi w programie AutoCAD i wydrukowanymi na drukarce 3D. Rama montażowa dla Raspberry Pi widoczna jest na rysunku \ref{rys:uchwyt:raspberry}. 
         Kształt uchwytu jest dopasowany tak, aby dało się go przymocować do kadłuba pomimo wystających z niego śrub. Do montażu ramy do BSP oraz mikrokomputera do ramy użyto śrub M2. Pomiędzy uchwytem a Raspberry Pi 
         dodano piankę amortyzującą wstrząsy a mikrokomputer został przymocowany z użyciem mosiężnych sześciokątnych kolumn o długości 2~cm i gwintowanych otworach. Na kolumny została przykręcona druga rama \ref{rys:uchwyt:pixhawk} 
@@ -447,8 +446,8 @@ WantedBy=multi-user.target
         działa w ten sam sposób co powiadomienie wysyłane po pomyślnym otworzeniu połączenia z Pixhawk. Wartości zmiennych globalnych \texttt{MAX\_DIST} oraz \texttt{GAP} zostały ustalone dzięki testom opisanym w sekcji 3.5.3. 
         Wartość \texttt{GAP} to odstęp w czasie pomiędzy kolejnymi odczytami. W przypadku użycia wielu czujników obok siebie istnieje ryzyko że po wywołaniu pomiaru u jednego z czujników, przejdziemy do drugiego zanim poprzedni 
         zakończy pomiar. W takiej sytuacji może się zdarzyć że fala ultradźwiękowa wysłana przez poprzedni czujnik dotrze do kolejnego, co skutkować będzie zaburzonym pomiarem i fałszywie krótkim zmierzonym dystansem. 
-        Ryzyko wystąpienia takiego problemu jest największe gdy czujniki zwrócone są w tę samą stronę, w przypadku zbudowanego systemu ostrzegania ryzyko zaburzenia pomiaru z tego powodu jest znikome. 
-        Mimo wszystko pozostawienie odstępu jest wskazane, a odstęp 27~ms nie jest wystarczająco długi aby uczynić program zawodnym przez zbyt rzadkie pomiary. Każda wartość pomiaru zwracana jest w postaci liczby 
+        Ryzyko wystąpienia takiego problemu jest największe gdy czujniki zwrócone są w tę samą stronę, w przypadku zbudowanego systemu ostrzegania ryzyko zaburzenia pomiaru z tego powodu jest znikome, 
+        mimo wszystko pozostawienie odstępu jest wskazane. Na podstawie testów wykonanych w podrozdziale 3.7.3 optymalny czas obliczono na 27~ms. Każda wartość pomiaru zwracana jest w postaci liczby 
         zmiennoprzecinkowej pomiędzy 0 a 1, gdzie 0 oznacza 0~cm a 1 oznacza maksymalną odległość pomiaru określaną w zmiennej \texttt{MAX\_DIST}. Wartość pomiaru jest mnożona przez 100 i maksymalną odległość pomiaru w celu 
         uzyskania wartości w centymetrach.
         \begin{lstlisting}[language=python, caption={Program ostrzegający o wykrytych przez czujniki przeszkodach}, label={lst:program1}]
@@ -465,8 +464,8 @@ Device.pin_factory = LGPIOFactory()
 DRONE_PORT = "/dev/serial/by-id/usb-Holybro_Pixhawk6C_450046001751333337363133-if00"
 
 MIN_DISTANCE_CM = 30
-MIN_SPEED = 0.3 # w m/s
-GAP = 0.027 # 27ms
+MIN_SPEED = 0.3  # w m/s
+GAP = 0.027      # 27ms
 MAX_DIST = 4.5
 
 SENSOR_ANGLES_DEG = {
@@ -479,10 +478,8 @@ sensor1 = DistanceSensor(echo=17, trigger=23, max_distance=MAX_DIST)
 sensor2 = DistanceSensor(echo=27, trigger=24, max_distance=MAX_DIST)
 sensor3 = DistanceSensor(echo=22, trigger=25, max_distance=MAX_DIST)
 
-
 def connect_pixhawk():
     #[...]
-
 
 def get_body_velocity(vehicle):
     velocity = vehicle.velocity
@@ -504,9 +501,7 @@ def get_speed_toward_sensor(v_forward, v_right, sensor_angle_deg):
     return v_forward * math.cos(angle_rad) + v_right * math.sin(angle_rad)
 
 
-def send_alert(vehicle):
-    message = "obstacle"
-
+def send_message(vehicle, message):
     vehicle.message_factory.statustext_send(
         mavutil.mavlink.MAV_SEVERITY_ALERT,
         message.encode("utf-8")
@@ -519,7 +514,7 @@ def check_distance(vehicle, distance_cm, sensor_id, v_forward, v_right):
     toward_speed = get_speed_toward_sensor(v_forward, v_right, sensor_angle)
 
     if distance_cm < MIN_DISTANCE_CM and toward_speed > MIN_SPEED:
-        send_alert(vehicle)
+        send_message(vehicle, "obstacle")
 
 
 def main():
@@ -528,11 +523,7 @@ def main():
     try:
         vehicle = connect_pixhawk()
 
-        vehicle.message_factory.statustext_send(
-            mavutil.mavlink.MAV_SEVERITY_ALERT,
-            b"Companion computer connected"
-        )
-        vehicle.flush()
+        send_message(vehicle, "Companion computer connected")
 
         while True:
             v_forward, v_right = get_body_velocity(vehicle)
@@ -638,7 +629,7 @@ def get_speed_toward_sensor(v_forward, v_right, sensor_angle_deg):
     return v_forward * math.cos(angle_rad) + v_right * math.sin(angle_rad)
 
 
-def send_alert(vehicle):
+def send_alert(vehicle, message):
     #[...]
 
 
@@ -647,7 +638,7 @@ def check_distance(vehicle, distance_cm, sensor_id, v_forward, v_right):
     toward_speed = get_speed_toward_sensor(v_forward, v_right, sensor_angle)
 
     if distance_cm < MIN_DISTANCE_CM and toward_speed > MIN_SPEED:
-        send_alert(vehicle)
+        send_alert(vehicle, "obstacle")
 
 
 def main():
@@ -656,11 +647,7 @@ def main():
     try:
         vehicle = connect_pixhawk()
 
-        vehicle.message_factory.statustext_send(
-            mavutil.mavlink.MAV_SEVERITY_ALERT,
-            b"Companion computer connected"
-        )
-        vehicle.flush()
+        send_alert(vehicle, "Companion computer connected")
 
         while True:
             v_forward, v_right = get_body_velocity(vehicle)
@@ -775,7 +762,7 @@ def calculate_threshold_cm(toward_speed):
     return threshold_cm
 
 
-def send_alert(vehicle, sensor_id):
+def send_alert(vehicle, message):
     #[...]
 
 
@@ -794,7 +781,7 @@ def check_distance(vehicle, distance_cm, sensor_id, v_forward, v_right):
     )
 
     if threshold_cm > 0.0 and distance_cm < threshold_cm:
-        send_alert(vehicle, sensor_id, distance_cm, threshold_cm)
+        send_alert(vehicle, f"sensor {sensor_id}: obstacle")
 
 
 def main():
@@ -804,11 +791,7 @@ def main():
         init_log_file()
         vehicle = connect_pixhawk()
 
-        vehicle.message_factory.statustext_send(
-            mavutil.mavlink.MAV_SEVERITY_ALERT,
-            b"Companion computer connected"
-        )
-        vehicle.flush()
+        send_alert(vehicle, "Companion computer connected")
 
         while True:
             v_forward, v_right = get_body_velocity(vehicle)
@@ -857,7 +840,7 @@ if __name__ == "__main__":
         Ostrzeżenie o wykroczeniu poza wyznaczony obszar jest wysyłane do pilota w sposób analogiczny do poprzednio opisanych programów.\par
         Poprawność działania programu zależna jest od poprawności odczytów obecnej pozycji drona. Zastosowany moduł M10 oferuje dokładność na poziomie 2.0~m CEP~\cite{web:holybro:m10gps}. W tym przypadku bardziej przydatną 
         miarą dokładności będzie R95 określające promień koła, którego środek jest faktyczną pozycją urządzenia geolokacyjnego, a pole jest obszarem w którym znajdzie się 95\% pomiarów. Wartość R95 można obliczyć mnożąc wartość CEP przez 
-        2.1~\cite{web:novatel:position:accuracy:measures}, dla użytego modułu GNSS wartość R95 to 4.2~m. W przypadku gdy zastosowanie programu wymaga pewności niewykraczania poza wyznaczony obszar, wskazane jest wyznaczenie strefy 
+        2.1~\cite[Table 2]{web:novatel:position:accuracy:measures}, dla użytego modułu GNSS wartość R95 to 4.2~m. W przypadku gdy zastosowanie programu wymaga pewności niewykraczania poza wyznaczony obszar, wskazane jest wyznaczenie strefy 
         z odpowiednim marginesem błędu wynoszącym co najmniej 4.2~m od faktycznych granic. Przykładowym zastosowaniem wymagającym gwarancji nieprzekroczenia granicy jest zabezpieczenie przed opuszczeniem strefy wyznaczonej przez PANSA~\cite{web:pansa:map}. 
         W zależności od miejsca odbywania lotu może być wymagana zgoda udzielona przez wieżę kontroli lotów lub przedstawienie wcześniej planu misji. Istnieją też strefy w których loty BSP są całkowicie zakazane dla pilotów cywilnych. 
         Odbywanie lotów bez wymaganych w danej strefie zezwoleń może nieść za sobą konsekwencje prawne, dlatego program ostrzegający przed wyjściem poza wyznaczony obszar może być użyteczny dla pilotów odbywających loty w pobliżu granic stref.
@@ -1111,9 +1094,9 @@ if __name__ == "__main__":
     odpowiada za stabilizację, obsługę czujników i sterowanie silnikami, a także rolę komputera asystującego, rozszerzającego możliwości pojazdu. Wyjaśniono również znaczenie 
     pojęć kluczowych dla zrozumienia dalszej części projektu. Dzięki temu praca nie ogranicza się jedynie do opisu gotowego rozwiązania, ale pokazuje również, z jakich elementów 
     składa się współczesny system BSP i jak poszczególne części współpracują ze sobą.\par
-    W części sprzętowej opisano dobór komponentów wykorzystanych do budowy platformy. Konstrukcja została oparta na ramie Holybro S500 v2, czterech silnikach bezszczotkowych 
-    AIR2216II, regulatorach BLHeli S 20A i śmigłach T1045II. Zastosowano również moduł GNSS Holybro M10, system komunikacji z pilotem oparty o aparaturę RadioMaster oraz system 
-    telemetrii Holybro SiK Telemetry Radio. Rolę komputera pokładowego pełnił Pixhawk 6C z oprogramowaniem ArduCopter, natomiast za obsługę dodatkowych programów odpowiadał 
+    W części sprzętowej opisano dobór komponentów wykorzystanych do budowy platformy. Konstrukcja została oparta na ramie HolyBro S500 v2, czterech silnikach bezszczotkowych 
+    AIR2216II, regulatorach BLHeli S 20A i śmigłach T1045II. Zastosowano również moduł GNSS HolyBro M10, system komunikacji z pilotem oparty o aparaturę RadioMaster oraz system 
+    telemetrii HolyBro SiK Telemetry Radio. Rolę komputera pokładowego pełnił Pixhawk 6C z oprogramowaniem ArduCopter, natomiast za obsługę dodatkowych programów odpowiadał 
     Raspberry Pi 5B. Komputer asystujący i pozostałe części drona wymagające zasilania otrzymały osobne, niezależne od siebie źródła prądu. Takie rozwiązanie ograniczyło 
     ryzyko problemów wynikających ze spadków napięcia w głównym układzie zasilania drona. Zaprojektowano własne elementy montażowe i wykonano je za pomocą druku 3D. Umożliwiło to 
     stabilne zamocowanie komputerów oraz zachowanie dostępu do chłodzenia Raspberry Pi i pinów GPIO. Własne elementy montażowe zastosowano również przy budowie systemu 
